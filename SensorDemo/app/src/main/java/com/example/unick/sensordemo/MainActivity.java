@@ -29,7 +29,6 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 //    private SensorManager mySensorManager;
-    android.support.design.widget.FloatingActionButton mFab;
 
 
     @Override
@@ -45,8 +44,6 @@ public class MainActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
                 Intent intent = new Intent();
                 intent.setClass(MainActivity.this,OpenstreetmapActivity.class);
                 startActivity(intent);
