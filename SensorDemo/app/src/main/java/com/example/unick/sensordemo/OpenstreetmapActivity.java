@@ -22,21 +22,29 @@ public class OpenstreetmapActivity extends AppCompatActivity {
     CompassOverlay mCompassOverlay;
     LocationManager mLocationManager;
 
+    private static Context ctx;
+    private static MapView map;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_openstreetmap);
 
-        Context ctx = getApplicationContext();
+        ctx = getApplicationContext();
         org.osmdroid.config.Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
         //important! set your user agent to prevent getting banned from the osm servers
 
-        MapView map = (MapView) findViewById(R.id.map);
+
+    }
+
+    public void onResume(){
+        super.onResume();
+        Configuration.getInstance().load(this, PreferenceManager.getDefaultSharedPreferences(this));
+
+        map = (MapView) findViewById(R.id.map);
         map.setTileSource(TileSourceFactory.MAPNIK);
         map.setBuiltInZoomControls(true);
         map.setMultiTouchControls(true);
-
-        //move the map on a default view point
         IMapController mapController = map.getController();
         mapController.setZoom(10);
 
@@ -45,9 +53,12 @@ public class OpenstreetmapActivity extends AppCompatActivity {
         mLocationOverlay.enableMyLocation();
         map.getOverlays().add(mLocationOverlay);
 
-        //set start point
-        mLocationManager = (LocationManager)getApplicationContext().getSystemService(LOCATION_SERVICE);
+        if(mLocationManager == null){
+            mLocationManager = (LocationManager)getApplicationContext().getSystemService(LOCATION_SERVICE);
+
+        }
         Location currentLocation = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        //move the map on a default view point
         GeoPoint startPoint = new GeoPoint(currentLocation.getLatitude(),currentLocation.getLongitude());
         mapController.setCenter(startPoint);
 
@@ -57,9 +68,11 @@ public class OpenstreetmapActivity extends AppCompatActivity {
         map.getOverlays().add(mCompassOverlay);
     }
 
-    public void onResume(){
-        super.onResume();
-        Configuration.getInstance().load(this, PreferenceManager.getDefaultSharedPreferences(this));
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if(mLocationManager != null){
+            mLocationManager = null;
+        }
     }
-
 }
