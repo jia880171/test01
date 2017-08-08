@@ -16,7 +16,9 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.unick.sensordemo.GEOReverseHelper;
 import com.example.unick.sensordemo.R;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.util.Date;
 
@@ -167,15 +169,16 @@ public class ShowGPS extends Fragment {
 //        // TODO: Update argument type and name
 //        void onFragmentInteraction(Uri uri);
 //    }
-
     // 定位監聽器實作
     private class MyLocationListener implements LocationListener {
         // GPS位置資訊已更新
         public void onLocationChanged(Location location) {
+            LatLng latLng = new LatLng(location.getLatitude(),location.getLongitude());
 
             textView1.setText("Location-GPS" + "\n" +
                     "緯度-Latitude：" + location.getLatitude() + "\n" +
                     "經度-Longitude：" + location.getLongitude() + "\n" +
+                    "地址-Address : " + GEOReverseHelper.getAddressByLatLng(latLng) + "\n" +
                     "精確度-Accuracy：" + location.getAccuracy() + "\n" +
                     "標高-Altitude：" + location.getAltitude() + "\n" +
                     "時間-Time：" + new Date(location.getTime()) + "\n" +
