@@ -4,6 +4,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -22,14 +25,13 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.example.unick.sensordemo.fragments.SensorLists;
+import com.example.unick.sensordemo.fragments.ShowGPS;
 import com.example.unick.sensordemo.fragments.ShowSensorData;
 
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-//    private SensorManager mySensorManager;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,6 +115,9 @@ public class MainActivity extends AppCompatActivity
             case R.id.nav_ShowSensorData:
                 fragment = new ShowSensorData();
                 break;
+            case R.id.nav_ShowGPS:
+               fragment = new ShowGPS();
+               break;
         }
 
         if (fragment != null) {

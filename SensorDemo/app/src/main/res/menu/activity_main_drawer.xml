@@ -11,9 +11,9 @@
             android:icon="@drawable/ic_menu_gallery"
             android:title="show sensors's data" />
         <item
-            android:id="@+id/nav_slideshow"
+            android:id="@+id/nav_ShowGPS"
             android:icon="@drawable/ic_menu_slideshow"
-            android:title="Google map" />
+            android:title="GPS" />
         <item
             android:id="@+id/nav_manage"
             android:icon="@drawable/ic_menu_manage"
