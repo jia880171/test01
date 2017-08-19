@@ -31,5 +31,9 @@ dependencies {
     compile 'org.osmdroid:osmdroid-android:5.6.5'
     compile 'org.osmdroid:osmdroid-third-party:5.6.5'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
+    compile 'com.google.firebase:firebase-auth:10.0.1'
     testCompile 'junit:junit:4.12'
 }
+
+
+apply plugin: 'com.google.gms.google-services'

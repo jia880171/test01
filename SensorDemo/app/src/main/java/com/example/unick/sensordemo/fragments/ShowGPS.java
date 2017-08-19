@@ -2,6 +2,7 @@ package com.example.unick.sensordemo.fragments;
 
 import android.content.Context;
 import android.content.Intent;
+import android.hardware.SensorManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -46,6 +47,9 @@ public class ShowGPS extends Fragment {
     private LocationManager mLocationManager;
     // 定位監聽器
     private LocationListener mLocationListener;
+
+//    private SensorManager sm ;
+//    private static final float G = 9.8F;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
