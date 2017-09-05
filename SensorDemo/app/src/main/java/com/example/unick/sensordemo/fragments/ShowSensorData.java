@@ -1,11 +1,16 @@
 package com.example.unick.sensordemo.fragments;
 
 import android.app.Notification;
+import android.content.ContentValues;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.location.LocationProvider;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -19,13 +24,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.unick.sensordemo.GEOReverseHelper;
 import com.example.unick.sensordemo.R;
 import com.example.unick.sensordemo.models.AccPost;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.lang.reflect.Array;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
@@ -62,15 +71,25 @@ public class ShowSensorData extends Fragment{
     float yValue;
     float zValue;
 
-    Vector tempVector = new Vector();
-    Vector x_hat = new Vector();
-    Vector y_hat = new Vector();
-    Vector z_hat = new Vector();
+    public final String LM_GPS = LocationManager.GPS_PROVIDER;
+    public final String LM_NETWORK = LocationManager.NETWORK_PROVIDER;
+    // 定位管理器
+    private LocationManager mLocationManager;
+    // 定位監聽器
+    private LocationListener mLocationListener;
+    private Double Lat;
+    private Double Lon;
+    private String add;
+    private Date time;
+    private Double speed;
+    private float bearing;
+
 
     TextView TextViewValueX;
     TextView TextViewValueY;
     TextView TextViewValueZ;
     Button button_start;
+    Button button_stop;
     Handler mHandler;
     Runnable mRun;
 
@@ -123,26 +142,27 @@ public class ShowSensorData extends Fragment{
             int sensorType = Sensor.TYPE_ACCELEROMETER;
             sm.registerListener(myAccelerometerListener,sm.getDefaultSensor(sensorType),SensorManager.SENSOR_DELAY_NORMAL);
         }
-        z_hat.add(0F);
-        z_hat.add(0F);
-        z_hat.add(0F);
+
+        //set location manarger
+        if (mLocationManager == null) {
+            mLocationManager =
+                    (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+            mLocationListener = new MyLocationListener();
+        }
+        // 獲得地理位置的更新資料 (GPS 與 NETWORK都註冊)
+        mLocationManager.requestLocationUpdates(LM_GPS, 0, 0, mLocationListener);
+        mLocationManager.requestLocationUpdates(LM_NETWORK, 0, 0, mLocationListener);
+        //setTitle("onResume ...");
 
         flagFormRun=true;
         new Thread(mRun = new Runnable() {
             @Override
             public void run() {
-//                int mCount=0;
                 while (flagFormRun){
                     try {
                         Message msg = new Message();
                         msg.what = 1;
                         mHandler.sendMessage(msg);
-//                        mCount = mCount+1;
-                        //reset coordinate
-//                        if(mCount % 5 == 0){
-//                            setCoordinateSystem();
-//                            Log.d("in if","set coordinate, count:"+mCount);
-//                        }
                         Thread.sleep(100);
                     }
                     catch (Exception e){
@@ -171,12 +191,12 @@ public class ShowSensorData extends Fragment{
                         stringBuilder_acc = new StringBuilder();
                         while (flag_start){
                             try {
-                                if(mCount>=20){
-                                    acc_record = stringBuilder_acc.toString();
-                                    Log.d("thread for button","count :" + mCount + ", String:"+acc_record);
-                                    writeAccPost(acc_record);
-                                    flag_start=false;
-                                }
+//                                if(mCount>=20){
+//                                    acc_record = stringBuilder_acc.toString();
+//                                    Log.d("thread for button","count :" + mCount + ", String:"+acc_record);
+//                                    writeAccPost(acc_record);
+//
+//                                }
                                 Message msg = new Message();
                                 mCount +=1 ;
                                 msg.what = 1;
@@ -194,18 +214,45 @@ public class ShowSensorData extends Fragment{
                     @Override
                     public void handleMessage(Message msg) {
                         super.handleMessage(msg);
+                        float sum = Math.abs(xValue)+Math.abs(yValue)+Math.abs(zValue);
                         stringBuilder_acc.append("[");
                         stringBuilder_acc.append("index: ");
                         stringBuilder_acc.append(msg.arg1);
+                        stringBuilder_acc.append(", time: ");
+                        stringBuilder_acc.append(time);
                         stringBuilder_acc.append(", sum: ");
-                        stringBuilder_acc.append(Math.abs(xValue)+Math.abs(yValue)+Math.abs(zValue));
+                        stringBuilder_acc.append(sum);
                         stringBuilder_acc.append(", x: ");
                         stringBuilder_acc.append(xValue);
                         stringBuilder_acc.append(", y: ");
                         stringBuilder_acc.append(yValue);
                         stringBuilder_acc.append(", z: ");
                         stringBuilder_acc.append(zValue);
+                        stringBuilder_acc.append(", latitude: ");
+                        stringBuilder_acc.append(Lat);
+                        stringBuilder_acc.append(", longitude: ");
+                        stringBuilder_acc.append(Lon);
+                        stringBuilder_acc.append(", address: ");
+                        stringBuilder_acc.append(add);
+                        stringBuilder_acc.append(", speed: ");
+                        stringBuilder_acc.append(speed);
+                        stringBuilder_acc.append(", bearing ");
+                        stringBuilder_acc.append(bearing);
                         stringBuilder_acc.append("]");
+
+                        // 將記錄新增到coffee資料表的參數
+                        ContentValues cv = new ContentValues();
+                        cv.put("Time", true);
+                        cv.put("Sum", sum);
+                        cv.put("x", xValue);
+                        cv.put("y", yValue);
+                        cv.put("z", zValue);
+
+
+//                        // 執行SQL語句
+//                        long id = db.insert("coffee_list", null, cv);
+//                        Toast.makeText(context, "_id：" + id, Toast.LENGTH_SHORT).show();
+
                     }
                 };
 
@@ -213,7 +260,63 @@ public class ShowSensorData extends Fragment{
             }
         });
 
+        button_stop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                flag_start=false;
+                if(flag_start!=true){
+                    acc_record = stringBuilder_acc.toString();
+                    writeAccPost(acc_record);
+                }
+            }
+        });
 
+
+    }
+
+    // 定位監聽器實作
+    private class MyLocationListener implements LocationListener {
+        // GPS位置資訊已更新
+        public void onLocationChanged(Location location) {
+            LatLng latLng = new LatLng(location.getLatitude(),location.getLongitude());
+
+            time = new Date(location.getTime());
+            Lat = location.getLatitude();
+            Lon = location.getLongitude();
+            add = GEOReverseHelper.getAddressByLatLng(latLng);
+            speed = location.getSpeed()*3.6;
+            bearing = location.getBearing();
+
+//            textView1.setText("Location-GPS" + "\n" +
+//                    "緯度-Latitude：" + location.getLatitude() + "\n" +
+//                    "經度-Longitude：" + location.getLongitude() + "\n" +
+//                    "地址-Address : " + GEOReverseHelper.getAddressByLatLng(latLng) + "\n" +
+//                    "精確度-Accuracy：" + location.getAccuracy() + "\n" +
+//                    "標高-Altitude：" + location.getAltitude() + "\n" +
+//                    "時間-Time：" + new Date(location.getTime()) + "\n" +
+//                    "速度-Speed：" + location.getSpeed()*3.6 + "km/hr" + "\n" +
+//                    "方位-Bearing：" + location.getBearing());
+            //setTitle("GPS位置資訊已更新");
+        }
+        public void onProviderDisabled(String provider) {
+        }
+
+        public void onProviderEnabled(String provider) {
+        }
+        // GPS位置資訊的狀態被更新
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+            switch (status) {
+                case LocationProvider.AVAILABLE:
+                    //setTitle("服務中");
+                    break;
+                case LocationProvider.OUT_OF_SERVICE:
+                    //setTitle("沒有服務");
+                    break;
+                case LocationProvider.TEMPORARILY_UNAVAILABLE:
+                    //setTitle("暫時不可使用");
+                    break;
+            }
+        }
     }
 
     private void writeAccPost(String body){
@@ -234,15 +337,6 @@ public class ShowSensorData extends Fragment{
                 xValue = sensorEvent.values[0] / G;
                 yValue = sensorEvent.values[1] / G;
                 zValue = sensorEvent.values[2] / G;
-
-                tempVector.clear();
-                tempVector.add(xValue);
-                tempVector.add(yValue);//heading
-                tempVector.add(zValue);//vertical
-
-//                xValue = xValue - (float)z_hat.get(0);
-//                yValue = yValue - (float)z_hat.get(1);
-//                zValue = zValue - (float)z_hat.get(2);
             }
         }
 
@@ -259,6 +353,7 @@ public class ShowSensorData extends Fragment{
         TextViewValueY = (TextView) myInflatedView.findViewById(R.id.tvy);
         TextViewValueZ = (TextView) myInflatedView.findViewById(R.id.tvz);
         button_start = (Button) myInflatedView.findViewById(R.id.button_start);
+        button_stop = (Button) myInflatedView.findViewById(R.id.button_stop);
 
         TextViewValueX.setText("x:"+xValue);
         TextViewValueY.setText("y:"+yValue);
@@ -288,17 +383,6 @@ public class ShowSensorData extends Fragment{
         return unit;
     }
 
-    public void setCoordinateSystem(){
-        z_hat.clear();
-        z_hat = tempVector;
-        Log.d("inSetCoor","0"+"temp_ x:"+tempVector.get(0)+"temp_ y:"+tempVector.get(1)+"temp_ z:"+tempVector.get(2));
-        Log.d("inSetCoor","1"+"z_hat x:"+z_hat.get(0)+"z_hat y:"+z_hat.get(1)+"z_hat z:"+z_hat.get(2));
-        z_hat = mUnit(z_hat);
-        Log.d("inSetCoor","2"+"z_hat x:"+z_hat.get(0)+"z_hat y:"+z_hat.get(1)+"z_hat z:"+z_hat.get(2));
-        Log.d("inSetCoor","---------");
-
-    }
-
     public void onPause(){
         /*
          * 很关键的部分：注意，说明文档中提到，即使activity不可见的时候，感应器依然会继续的工作，测试的时候可以发现，没有正常的刷新频率
@@ -307,6 +391,11 @@ public class ShowSensorData extends Fragment{
         sm.unregisterListener(myAccelerometerListener);
         sm = null;
         flagFormRun=false;
+        if (mLocationManager != null) {
+            // 移除 mLocationListener 監聽器
+            mLocationManager.removeUpdates(mLocationListener);
+            mLocationManager = null;
+        }
         super.onPause();
     }
 

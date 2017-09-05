@@ -35,6 +35,12 @@
             android:layout_below="@+id/tvz"
             android:id="@+id/button_start"
             android:text="start!"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/button_start"
+            android:id="@+id/button_stop"
+            android:text="stop!"/>
 
     </RelativeLayout>
 
