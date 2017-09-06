@@ -3,6 +3,7 @@ package com.example.unick.sensordemo.fragments;
 import android.app.Notification;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -28,6 +29,7 @@ import android.widget.Toast;
 
 import com.example.unick.sensordemo.GEOReverseHelper;
 import com.example.unick.sensordemo.R;
+import com.example.unick.sensordemo.UploadService;
 import com.example.unick.sensordemo.models.AccPost;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.DatabaseReference;
@@ -100,6 +102,8 @@ public class ShowSensorData extends Fragment{
 
     boolean flag_start=false;
 
+    private Intent intent;
+
     public ShowSensorData() {
         // Required empty public constructor
     }
@@ -132,6 +136,7 @@ public class ShowSensorData extends Fragment{
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        intent = new Intent(getActivity(), UploadService.class);
     }
 
     @Override
@@ -180,96 +185,88 @@ public class ShowSensorData extends Fragment{
             }
         };
 
+        //button_start
         button_start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                flag_start = true;
-                new Thread(mRun2 = new Runnable() {
-                    @Override
-                    public void run() {
-                        int mCount = 0;
-                        stringBuilder_acc = new StringBuilder();
-                        while (flag_start){
-                            try {
-//                                if(mCount>=20){
-//                                    acc_record = stringBuilder_acc.toString();
-//                                    Log.d("thread for button","count :" + mCount + ", String:"+acc_record);
-//                                    writeAccPost(acc_record);
+
+                getActivity().startService(intent);
+//                flag_start = true;
+//                new Thread(mRun2 = new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        int mCount = 0;
+//                        stringBuilder_acc = new StringBuilder();
+//                        while (flag_start){
+//                            try {
+//                                Message msg = new Message();
+//                                mCount +=1 ;
+//                                msg.what = 1;
+//                                msg.arg1 = mCount;
+//                                mHandler2.sendMessage(msg);
+//                                Thread.sleep(500);
+//                                Log.d("Thread","count"+mCount);
+//                            }
+//                            catch (Exception e){
+//                            }
+//                        }
+//                    }
+//                }).start();
+//                mHandler2 = new Handler(){
+//                    @Override
+//                    public void handleMessage(Message msg) {
+//                        super.handleMessage(msg);
+//                        float sum = Math.abs(xValue)+Math.abs(yValue)+Math.abs(zValue);
+//                        stringBuilder_acc.append("[");
+//                        stringBuilder_acc.append("index: ");
+//                        stringBuilder_acc.append(msg.arg1);
+//                        stringBuilder_acc.append(", time: ");
+//                        stringBuilder_acc.append(time);
+//                        stringBuilder_acc.append(", sum: ");
+//                        stringBuilder_acc.append(sum);
+//                        stringBuilder_acc.append(", x: ");
+//                        stringBuilder_acc.append(xValue);
+//                        stringBuilder_acc.append(", y: ");
+//                        stringBuilder_acc.append(yValue);
+//                        stringBuilder_acc.append(", z: ");
+//                        stringBuilder_acc.append(zValue);
+//                        stringBuilder_acc.append(", latitude: ");
+//                        stringBuilder_acc.append(Lat);
+//                        stringBuilder_acc.append(", longitude: ");
+//                        stringBuilder_acc.append(Lon);
+//                        stringBuilder_acc.append(", address: ");
+//                        stringBuilder_acc.append(add);
+//                        stringBuilder_acc.append(", speed: ");
+//                        stringBuilder_acc.append(speed);
+//                        stringBuilder_acc.append(", bearing ");
+//                        stringBuilder_acc.append(bearing);
+//                        stringBuilder_acc.append("]");
 //
-//                                }
-                                Message msg = new Message();
-                                mCount +=1 ;
-                                msg.what = 1;
-                                msg.arg1 = mCount;
-                                mHandler2.sendMessage(msg);
-                                Thread.sleep(500);
-                                Log.d("Thread","count"+mCount);
-                            }
-                            catch (Exception e){
-                            }
-                        }
-                    }
-                }).start();
-                mHandler2 = new Handler(){
-                    @Override
-                    public void handleMessage(Message msg) {
-                        super.handleMessage(msg);
-                        float sum = Math.abs(xValue)+Math.abs(yValue)+Math.abs(zValue);
-                        stringBuilder_acc.append("[");
-                        stringBuilder_acc.append("index: ");
-                        stringBuilder_acc.append(msg.arg1);
-                        stringBuilder_acc.append(", time: ");
-                        stringBuilder_acc.append(time);
-                        stringBuilder_acc.append(", sum: ");
-                        stringBuilder_acc.append(sum);
-                        stringBuilder_acc.append(", x: ");
-                        stringBuilder_acc.append(xValue);
-                        stringBuilder_acc.append(", y: ");
-                        stringBuilder_acc.append(yValue);
-                        stringBuilder_acc.append(", z: ");
-                        stringBuilder_acc.append(zValue);
-                        stringBuilder_acc.append(", latitude: ");
-                        stringBuilder_acc.append(Lat);
-                        stringBuilder_acc.append(", longitude: ");
-                        stringBuilder_acc.append(Lon);
-                        stringBuilder_acc.append(", address: ");
-                        stringBuilder_acc.append(add);
-                        stringBuilder_acc.append(", speed: ");
-                        stringBuilder_acc.append(speed);
-                        stringBuilder_acc.append(", bearing ");
-                        stringBuilder_acc.append(bearing);
-                        stringBuilder_acc.append("]");
-
-                        // 將記錄新增到coffee資料表的參數
-                        ContentValues cv = new ContentValues();
-                        cv.put("Time", true);
-                        cv.put("Sum", sum);
-                        cv.put("x", xValue);
-                        cv.put("y", yValue);
-                        cv.put("z", zValue);
-
-
-//                        // 執行SQL語句
-//                        long id = db.insert("coffee_list", null, cv);
-//                        Toast.makeText(context, "_id：" + id, Toast.LENGTH_SHORT).show();
-
-                    }
-                };
-
-
+//                        // 將記錄新增到coffee資料表的參數
+//                        ContentValues cv = new ContentValues();
+//                        cv.put("Time", true);
+//                        cv.put("Sum", sum);
+//                        cv.put("x", xValue);
+//                        cv.put("y", yValue);
+//                        cv.put("z", zValue);
+//                    }
+//                };
             }
         });
+        //button_start
 
+
+        //button_stop
         button_stop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                flag_start=false;
-                if(flag_start!=true){
-                    acc_record = stringBuilder_acc.toString();
-                    writeAccPost(acc_record);
-                }
+//                flag_start=false;
+//                acc_record = stringBuilder_acc.toString();
+//                writeAccPost(acc_record);
+                getActivity().stopService(intent);
             }
         });
+        //button_stop
 
 
     }
@@ -286,17 +283,6 @@ public class ShowSensorData extends Fragment{
             add = GEOReverseHelper.getAddressByLatLng(latLng);
             speed = location.getSpeed()*3.6;
             bearing = location.getBearing();
-
-//            textView1.setText("Location-GPS" + "\n" +
-//                    "緯度-Latitude：" + location.getLatitude() + "\n" +
-//                    "經度-Longitude：" + location.getLongitude() + "\n" +
-//                    "地址-Address : " + GEOReverseHelper.getAddressByLatLng(latLng) + "\n" +
-//                    "精確度-Accuracy：" + location.getAccuracy() + "\n" +
-//                    "標高-Altitude：" + location.getAltitude() + "\n" +
-//                    "時間-Time：" + new Date(location.getTime()) + "\n" +
-//                    "速度-Speed：" + location.getSpeed()*3.6 + "km/hr" + "\n" +
-//                    "方位-Bearing：" + location.getBearing());
-            //setTitle("GPS位置資訊已更新");
         }
         public void onProviderDisabled(String provider) {
         }
@@ -358,6 +344,7 @@ public class ShowSensorData extends Fragment{
         TextViewValueX.setText("x:"+xValue);
         TextViewValueY.setText("y:"+yValue);
         TextViewValueZ.setText("z:"+zValue);
+
         return myInflatedView;
     }
 
