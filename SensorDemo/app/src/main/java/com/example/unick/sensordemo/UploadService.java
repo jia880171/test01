@@ -45,9 +45,9 @@ public class UploadService extends Service {
     private StringBuilder stringBuilder_acc;
     private String acc_record;
 
-    float xValue;
-    float yValue;
-    float zValue;
+    float xValue = 0.0f;
+    float yValue = 0.0f;
+    float zValue = 0.0f;
 
     public final String LM_GPS = LocationManager.GPS_PROVIDER;
     public final String LM_NETWORK = LocationManager.NETWORK_PROVIDER;
@@ -61,6 +61,7 @@ public class UploadService extends Service {
     private Date time;
     private Double speed = 0.0;
     private float bearing;
+    private int mCount = 0;
 
     Handler mHandler;
     Runnable mRun;
@@ -71,6 +72,7 @@ public class UploadService extends Service {
 
     boolean flag_mRun;
     boolean flag_start = false;
+    boolean flag_start_record = false;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -111,7 +113,17 @@ public class UploadService extends Service {
                         Message msg = new Message();
                         msg.what = 1;
                         mHandler.sendMessage(msg);
-                        Thread.sleep(60000);//checking rate : 1 per/min
+                        if(flag_start_record){
+                            Thread.sleep(500);//record rate : 2 per/sec
+                        }
+                        else {
+                            Log.d("checking","60 per/min");
+                            stringBuilder_acc = new StringBuilder();
+                            mCount = 0;
+                            Thread.sleep(60000);//checking rate : 1 per/min
+
+                        }
+
                     }
                     catch (Exception e){
                     }
@@ -121,76 +133,51 @@ public class UploadService extends Service {
         mHandler = new Handler(){
             @Override
             public void handleMessage(Message msg) {
-                if(speed>=15){
+                if(speed >= 15){
                     Log.d("inService","speed >= 15 ");
                     Log.d("inService checkingSpeed","speed = " + speed);
 
-                    //thread for recording
-                    flag_start = true;
-                    thread_append = new Thread(mRun2 = new Runnable() {
-                        @Override
-                        public void run() {
-                            int mCount = 0;
-                            stringBuilder_acc = new StringBuilder();
-                            while (flag_start){
-                                try {
-                                    Message msg = new Message();
-                                    mCount +=1 ;
-                                    msg.what = 1;
-                                    msg.arg1 = mCount;
-                                    mHandler2.sendMessage(msg);
-                                    Thread.sleep(500);//record rate : 2 per/second
-                                    Log.d("Thread","count"+mCount);
-                                    // stop record when speed <=10
-                                    if(speed<10){
-                                        Log.d("inService","speed < 10 ");
-                                        Log.d("inService checkingSpeed","speed = " + speed);
-                                        flag_start = false;
-                                        acc_record = stringBuilder_acc.toString();
-                                        writeAccPost(acc_record);//upload to fireBase
-                                    }
-                                }
-                                catch (Exception e){
-                                }
-                            }
-                        }
-                    });
-                    thread_append.start();
-                    mHandler2 = new Handler(){
-                        @Override
-                        public void handleMessage(Message msg) {
-                            super.handleMessage(msg);
-                            float sum = Math.abs(xValue)+Math.abs(yValue)+Math.abs(zValue);
-                            stringBuilder_acc.append("[");
-                            stringBuilder_acc.append("index: ");
-                            stringBuilder_acc.append(msg.arg1);
-                            stringBuilder_acc.append(", time: ");
-                            stringBuilder_acc.append(time);
-                            stringBuilder_acc.append(", sum: ");
-                            stringBuilder_acc.append(sum);
-                            stringBuilder_acc.append(", x: ");
-                            stringBuilder_acc.append(xValue);
-                            stringBuilder_acc.append(", y: ");
-                            stringBuilder_acc.append(yValue);
-                            stringBuilder_acc.append(", z: ");
-                            stringBuilder_acc.append(zValue);
-                            stringBuilder_acc.append(", latitude: ");
-                            stringBuilder_acc.append(Lat);
-                            stringBuilder_acc.append(", longitude: ");
-                            stringBuilder_acc.append(Lon);
-                            stringBuilder_acc.append(", address: ");
-                            stringBuilder_acc.append(add);
-                            stringBuilder_acc.append(", speed: ");
-                            stringBuilder_acc.append(speed);
-                            stringBuilder_acc.append(", bearing ");
-                            stringBuilder_acc.append(bearing);
-                            stringBuilder_acc.append("]");
-                        }
-                    };
-                    try {
-                        thread_append.join();//wait for child thread
-                    } catch (InterruptedException e){
+                    flag_start_record = true;
+                    mCount +=1 ;
+                    float sum = Math.abs(xValue)+Math.abs(yValue)+Math.abs(zValue);
+                    stringBuilder_acc.append("[");
+                    stringBuilder_acc.append("index: ");
+                    stringBuilder_acc.append(mCount);
+                    stringBuilder_acc.append(", time: ");
+                    stringBuilder_acc.append(time);
+                    stringBuilder_acc.append(", sum: ");
+                    stringBuilder_acc.append(sum);
+                    stringBuilder_acc.append(", x: ");
+                    stringBuilder_acc.append(xValue);
+                    stringBuilder_acc.append(", y: ");
+                    stringBuilder_acc.append(yValue);
+                    stringBuilder_acc.append(", z: ");
+                    stringBuilder_acc.append(zValue);
+                    stringBuilder_acc.append(", latitude: ");
+                    stringBuilder_acc.append(Lat);
+                    stringBuilder_acc.append(", longitude: ");
+                    stringBuilder_acc.append(Lon);
+                    stringBuilder_acc.append(", address: ");
+                    stringBuilder_acc.append(add);
+                    stringBuilder_acc.append(", speed: ");
+                    stringBuilder_acc.append(speed);
+                    stringBuilder_acc.append(", bearing ");
+                    stringBuilder_acc.append(bearing);
+                    stringBuilder_acc.append("]");
 
+//                    if(mCount>=60){
+//                        Log.d("inService mCount>=60","testing");
+//                        flag_start_record = false;
+//                        acc_record = stringBuilder_acc.toString();
+//                        writeAccPost(acc_record);//upload to fireBase
+//                    }
+
+                    if(speed<5){
+                        Log.d("inService","speed < 10 ");
+                        Log.d("inService checkingSpeed","speed = " + speed);
+                        flag_start_record = false;
+                        acc_record = stringBuilder_acc.toString();
+                        writeAccPost(acc_record);//upload to fireBase
                     }
                 }
                 super.handleMessage(msg);
@@ -242,9 +229,6 @@ public class UploadService extends Service {
             add = GEOReverseHelper.getAddressByLatLng(latLng);
             speed = location.getSpeed()*3.6;
             bearing = location.getBearing();
-
-            Log.d("mLocationManager","speed: " +speed);
-            Log.d("mLocationManager","add: " +add);
         }
         public void onProviderDisabled(String provider) {
         }
