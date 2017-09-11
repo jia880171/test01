@@ -63,8 +63,9 @@ public class UploadService extends Service {
     private float bearing;
     private int mCount = 0;
 
-    private Runnable mRun;
+    Runnable mRun;
     private boolean flag_mRun;
+    private boolean flag_recording;
     private boolean flag_have_record;
 
 
@@ -108,16 +109,19 @@ public class UploadService extends Service {
                 while (flag_mRun){
                     try {
                         if(speed>=15){
-                            Log.d("inService","speed >= 15 ");
-                            Log.d("inService checkingSpeed","speed = " + speed);
+                            flag_recording=true;
+                            Log.d("inService","speed >= 15, start recording!");
+                        }
+                        if(flag_recording){
+                            Log.d("inService","speed = " + speed);
+                            Log.d("inService","recording...");
                             mCount +=1 ;
-                            flag_have_record=true;
                             stringBuildAppend();
-                            if(speed <=5 && flag_have_record==true){
-                                flag_have_record=false;
+                            if(speed<5 && flag_recording==true && speed!=0){
+                                flag_recording=false;
                                 mCount=0;
-                                Log.d("inService","speed < 5 ");
-                                Log.d("inService checkingSpeed","speed = " + speed);
+                                Log.d("inService","speed = " + speed);
+                                Log.d("inService","speed <5, start uploading!");
                                 acc_record = stringBuilder_acc.toString();
                                 writeAccPost(acc_record);//upload to fireBase
                             }
