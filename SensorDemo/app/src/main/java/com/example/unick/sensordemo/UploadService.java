@@ -173,7 +173,7 @@ public class UploadService extends Service {
 //                    }
 
                     if(speed<5){
-                        Log.d("inService","speed < 10 ");
+                        Log.d("inService","speed < 5 ");
                         Log.d("inService checkingSpeed","speed = " + speed);
                         flag_start_record = false;
                         acc_record = stringBuilder_acc.toString();
