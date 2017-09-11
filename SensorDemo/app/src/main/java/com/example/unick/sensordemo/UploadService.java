@@ -45,9 +45,9 @@ public class UploadService extends Service {
     private StringBuilder stringBuilder_acc;
     private String acc_record;
 
-    float xValue = 0.0f;
-    float yValue = 0.0f;
-    float zValue = 0.0f;
+    private float xValue = 0.0f;
+    private float yValue = 0.0f;
+    private float zValue = 0.0f;
 
     public final String LM_GPS = LocationManager.GPS_PROVIDER;
     public final String LM_NETWORK = LocationManager.NETWORK_PROVIDER;
@@ -63,16 +63,10 @@ public class UploadService extends Service {
     private float bearing;
     private int mCount = 0;
 
-    Handler mHandler;
-    Runnable mRun;
+    private Runnable mRun;
+    private boolean flag_mRun;
+    private boolean flag_have_record;
 
-    Thread thread_append;
-    Handler mHandler2;
-    Runnable mRun2;
-
-    boolean flag_mRun;
-    boolean flag_start = false;
-    boolean flag_start_record = false;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -80,7 +74,7 @@ public class UploadService extends Service {
     }
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
+    public int onStartCommand(Intent intent, final int flags, int startId) {
         Log.i("my Service Log","onStartCommand()");
 
         //set fireBase
@@ -103,17 +97,30 @@ public class UploadService extends Service {
             mLocationManager.requestLocationUpdates(LM_NETWORK, 0, 0, mLocationListener);
         }
 
+
         //thread for checking speed
+        stringBuilder_acc = new StringBuilder();
         flag_mRun = true;
+        flag_have_record = false;
         new Thread(mRun = new Runnable() {
             @Override
             public void run() {
                 while (flag_mRun){
                     try {
-                        Message msg = new Message();
-                        msg.what = 1;
-                        mHandler.sendMessage(msg);
-                        if(flag_start_record){
+                        if(speed>=15){
+                            Log.d("inService","speed >= 15 ");
+                            Log.d("inService checkingSpeed","speed = " + speed);
+                            mCount +=1 ;
+                            flag_have_record=true;
+                            stringBuildAppend();
+                            if(speed <=5 && flag_have_record==true){
+                                flag_have_record=false;
+                                mCount=0;
+                                Log.d("inService","speed < 5 ");
+                                Log.d("inService checkingSpeed","speed = " + speed);
+                                acc_record = stringBuilder_acc.toString();
+                                writeAccPost(acc_record);//upload to fireBase
+                            }
                             Thread.sleep(500);//record rate : 2 per/sec
                         }
                         else {
@@ -121,70 +128,42 @@ public class UploadService extends Service {
                             stringBuilder_acc = new StringBuilder();
                             mCount = 0;
                             Thread.sleep(60000);//checking rate : 1 per/min
-
                         }
-
                     }
                     catch (Exception e){
                     }
                 }
             }
         }).start();
-        mHandler = new Handler(){
-            @Override
-            public void handleMessage(Message msg) {
-                if(speed >= 15){
-                    Log.d("inService","speed >= 15 ");
-                    Log.d("inService checkingSpeed","speed = " + speed);
-
-                    flag_start_record = true;
-                    mCount +=1 ;
-                    float sum = Math.abs(xValue)+Math.abs(yValue)+Math.abs(zValue);
-                    stringBuilder_acc.append("[");
-                    stringBuilder_acc.append("index: ");
-                    stringBuilder_acc.append(mCount);
-                    stringBuilder_acc.append(", time: ");
-                    stringBuilder_acc.append(time);
-                    stringBuilder_acc.append(", sum: ");
-                    stringBuilder_acc.append(sum);
-                    stringBuilder_acc.append(", x: ");
-                    stringBuilder_acc.append(xValue);
-                    stringBuilder_acc.append(", y: ");
-                    stringBuilder_acc.append(yValue);
-                    stringBuilder_acc.append(", z: ");
-                    stringBuilder_acc.append(zValue);
-                    stringBuilder_acc.append(", latitude: ");
-                    stringBuilder_acc.append(Lat);
-                    stringBuilder_acc.append(", longitude: ");
-                    stringBuilder_acc.append(Lon);
-                    stringBuilder_acc.append(", address: ");
-                    stringBuilder_acc.append(add);
-                    stringBuilder_acc.append(", speed: ");
-                    stringBuilder_acc.append(speed);
-                    stringBuilder_acc.append(", bearing ");
-                    stringBuilder_acc.append(bearing);
-                    stringBuilder_acc.append("]");
-
-//                    if(mCount>=60){
-//                        Log.d("inService mCount>=60","testing");
-//                        flag_start_record = false;
-//                        acc_record = stringBuilder_acc.toString();
-//                        writeAccPost(acc_record);//upload to fireBase
-//                    }
-
-                    if(speed<5){
-                        Log.d("inService","speed < 5 ");
-                        Log.d("inService checkingSpeed","speed = " + speed);
-                        flag_start_record = false;
-                        acc_record = stringBuilder_acc.toString();
-                        writeAccPost(acc_record);//upload to fireBase
-                    }
-                }
-                super.handleMessage(msg);
-            }
-        };
-
         return Service.START_STICKY;
+    }
+
+    public void stringBuildAppend(){
+        float sum = Math.abs(xValue)+Math.abs(yValue)+Math.abs(zValue);
+        stringBuilder_acc.append("[");
+        stringBuilder_acc.append("index: ");
+        stringBuilder_acc.append(mCount);
+        stringBuilder_acc.append(", time: ");
+        stringBuilder_acc.append(time);
+        stringBuilder_acc.append(", sum: ");
+        stringBuilder_acc.append(sum);
+        stringBuilder_acc.append(", x: ");
+        stringBuilder_acc.append(xValue);
+        stringBuilder_acc.append(", y: ");
+        stringBuilder_acc.append(yValue);
+        stringBuilder_acc.append(", z: ");
+        stringBuilder_acc.append(zValue);
+        stringBuilder_acc.append(", latitude: ");
+        stringBuilder_acc.append(Lat);
+        stringBuilder_acc.append(", longitude: ");
+        stringBuilder_acc.append(Lon);
+        stringBuilder_acc.append(", address: ");
+        stringBuilder_acc.append(add);
+        stringBuilder_acc.append(", speed: ");
+        stringBuilder_acc.append(speed);
+        stringBuilder_acc.append(", bearing ");
+        stringBuilder_acc.append(bearing);
+        stringBuilder_acc.append("]");
     }
 
     @Override
