@@ -2,6 +2,9 @@ package com.example.unick.sensordemo.fragments;
 
 import android.content.Context;
 import android.content.Intent;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -22,6 +25,8 @@ import com.example.unick.sensordemo.R;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.Date;
+
+import static com.google.android.gms.internal.zzagz.runOnUiThread;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -47,6 +52,7 @@ public class ShowGPS extends Fragment {
     private LocationManager mLocationManager;
     // 定位監聽器
     private LocationListener mLocationListener;
+    //轉向監視器
 
 //    private SensorManager sm ;
 //    private static final float G = 9.8F;
@@ -54,6 +60,10 @@ public class ShowGPS extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
+    private SensorManager sensor_manager;
+    private MySensorEventListener listener;
+    private TextView textView2;
 
     //private OnFragmentInteractionListener mListener;
 
@@ -100,6 +110,22 @@ public class ShowGPS extends Fragment {
         mLocationManager.requestLocationUpdates(LM_GPS, 0, 0, mLocationListener);
         mLocationManager.requestLocationUpdates(LM_NETWORK, 0, 0, mLocationListener);
         //setTitle("onResume ...");
+
+
+        sensor_manager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
+        // 方向偵測器
+        Sensor aSensor = sensor_manager
+                .getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+
+        Sensor mfSensor = sensor_manager
+                .getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+
+        listener = new MySensorEventListener();
+        sensor_manager.registerListener(listener, aSensor,
+                SensorManager.SENSOR_DELAY_NORMAL);
+        sensor_manager.registerListener(listener, mfSensor,
+                SensorManager.SENSOR_DELAY_NORMAL);
+
         super.onResume();
     }
 
@@ -110,6 +136,7 @@ public class ShowGPS extends Fragment {
             mLocationManager.removeUpdates(mLocationListener);
             mLocationManager = null;
         }
+        sensor_manager.unregisterListener(listener);
         //setTitle("onPause ...");
         super.onPause();
     }
@@ -123,6 +150,9 @@ public class ShowGPS extends Fragment {
         mLocationListener = new MyLocationListener();
         textView1 = (TextView) myInflatedView.findViewById(R.id.textView1);
         textView1.setText("haven't got GPS");
+
+        textView2 = (TextView) myInflatedView.findViewById(R.id.textView2);
+
         button = (Button) myInflatedView.findViewById(R.id.button1);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -173,6 +203,79 @@ public class ShowGPS extends Fragment {
 //        // TODO: Update argument type and name
 //        void onFragmentInteraction(Uri uri);
 //    }
+
+    private class MySensorEventListener implements SensorEventListener {
+
+        private float[] accelerometerValues;
+        private float[] magneticFieldValues;
+
+        @Override
+        public void onSensorChanged(SensorEvent event) {
+            if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+                accelerometerValues = (float[]) event.values.clone();
+            } else if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
+                magneticFieldValues = (float[]) event.values.clone();
+            }
+
+            if (accelerometerValues != null && magneticFieldValues != null) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        // 計算方位
+                        calculateOrientation();
+                    }
+                });
+            }
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor arg0, int arg1) {
+            // TODO Auto-generated method stub
+
+        }
+
+        // 計算方位
+        private void calculateOrientation() {
+
+            //(-180~180) 0:正北，90:正東，180/-180:正南，-90:正西
+            float[] values = new float[3];
+
+            float[] inR = new float[9];
+            SensorManager.getRotationMatrix(inR, null, accelerometerValues, magneticFieldValues);
+
+            // 利用重映方向參考坐標系 (非必要)
+            float[] outR = new float[9];
+            SensorManager.remapCoordinateSystem(inR, SensorManager.AXIS_X, SensorManager.AXIS_Z, outR);
+
+            SensorManager.getOrientation(inR, values); // 第一個參數可以置換 inR 或 outR
+
+
+            values[0] = (float) Math.toDegrees(values[0]);
+            float degress = values[0];
+            textView2.setText("Degress:" + degress);
+            if (values[0] >= -5 && values[0] < 5) {
+                textView2.setText("Degress:" + degress + "\n正北");
+            } else if (values[0] >= 40 && values[0] < 50) {
+                textView2.setText("Degress:" + degress + "\n東北");
+            } else if (values[0] >= 85 && values[0] <= 95) {
+                textView2.setText("Degress:" + degress + "\n正東");
+            } else if (values[0] >= 130 && values[0] < 140) {
+                textView2.setText("Degress:" + degress + "\n東南");
+            } else if ((values[0] >= 175 && values[0] <= 180)
+                    || (values[0]) >= -180 && values[0] < -175) {
+                textView2.setText("Degress:" + degress + "\n正南");
+            } else if (values[0] >= -140 && values[0] < -130) {
+                textView2.setText("Degress:" + degress + "\n西南");
+            } else if (values[0] >= -95 && values[0] < -85) {
+                textView2.setText("Degress:" + degress + "\n正西");
+            } else if (values[0] >= -50 && values[0] < -40) {
+                textView2.setText("Degress:" + degress + "\n西北");
+            }
+        }
+
+    }
+
+
     // 定位監聽器實作
     private class MyLocationListener implements LocationListener {
         // GPS位置資訊已更新
