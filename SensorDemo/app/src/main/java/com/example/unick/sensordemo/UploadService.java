@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static android.content.ContentValues.TAG;
+import static com.google.android.gms.internal.zzagz.runOnUiThread;
 
 /**
  * Created by unick on 2017/9/5.
@@ -39,29 +40,26 @@ public class UploadService extends Service {
     @Nullable
 
     private DatabaseReference mDatabase;
-    private SensorManager sm ;
-    private static final float G = 9.8F;
 
     private StringBuilder stringBuilder_acc;
     private String acc_record;
 
-    private float xValue = 0.0f;
-    private float yValue = 0.0f;
-    private float zValue = 0.0f;
-
     public final String LM_GPS = LocationManager.GPS_PROVIDER;
     public final String LM_NETWORK = LocationManager.NETWORK_PROVIDER;
+
+    private int mCount=0;
     // 定位管理器
     private LocationManager mLocationManager;
     // 定位監聽器
     private LocationListener mLocationListener;
-    private Double Lat;
-    private Double Lon;
-    private String add;
+    private LatLng latLng;
+    //private String add;
     private Date time;
     private Double speed = 0.0;
-    private float bearing;
-    private int mCount = 0;
+    //轉向器
+    private SensorManager sensor_manager;
+    private MySensorEventListener listener;
+    private float degree;
 
     Runnable mRun;
     private boolean flag_mRun;
@@ -80,14 +78,6 @@ public class UploadService extends Service {
 
         //set fireBase
         mDatabase = FirebaseDatabase.getInstance().getReference();
-
-        //set sensor manager
-        if(sm == null){
-            sm = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-            int sensorType = Sensor.TYPE_ACCELEROMETER;
-            sm.registerListener(myAccelerometerListener,sm.getDefaultSensor(sensorType),SensorManager.SENSOR_DELAY_NORMAL);
-        }
-
         //set location manager
         if (mLocationManager == null) {
             mLocationManager =
@@ -97,7 +87,13 @@ public class UploadService extends Service {
             mLocationManager.requestLocationUpdates(LM_GPS, 0, 0, mLocationListener);
             mLocationManager.requestLocationUpdates(LM_NETWORK, 0, 0, mLocationListener);
         }
-
+        //set getOrientation
+        sensor_manager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        Sensor aSensor = sensor_manager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        Sensor mfSensor = sensor_manager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+        listener = new MySensorEventListener();
+        sensor_manager.registerListener(listener, aSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        sensor_manager.registerListener(listener, mfSensor, SensorManager.SENSOR_DELAY_NORMAL);
 
         //thread for checking speed
         stringBuilder_acc = new StringBuilder();
@@ -108,29 +104,31 @@ public class UploadService extends Service {
             public void run() {
                 while (flag_mRun){
                     try {
-                        if(speed>=15){
+                        if(flag_recording==false && speed>=15){
                             flag_recording=true;
                             Log.d("inService","speed >= 15, start recording!");
-                        }
-                        if(flag_recording){
+                        } else if(flag_recording){
                             Log.d("inService","speed = " + speed);
                             Log.d("inService","recording...");
-                            mCount +=1 ;
                             stringBuildAppend();
-                            if(speed<5 && flag_recording==true && speed!=0){
-                                flag_recording=false;
+                            if(speed>5){
+                                Log.d("inService","set mCount to 0");
                                 mCount=0;
-                                Log.d("inService","speed = " + speed);
-                                Log.d("inService","speed <5, start uploading!");
-                                acc_record = stringBuilder_acc.toString();
-                                writeAccPost(acc_record);//upload to fireBase
+                            } else if(speed<5){
+                                mCount = mCount +1;
+                                Log.d("inService","mCount:" + mCount);
+                                if(mCount>=5){
+                                    flag_recording=false;
+                                    Log.d("inService","speed = " + speed);
+                                    Log.d("inService","speed <5, start uploading!");
+                                    acc_record = stringBuilder_acc.toString();
+                                    writeAccPost(acc_record);//upload to fireBase
+                                }
                             }
                             Thread.sleep(500);//record rate : 2 per/sec
-                        }
-                        else {
+                        } else {
                             Log.d("checking","60 per/min");
                             stringBuilder_acc = new StringBuilder();
-                            mCount = 0;
                             Thread.sleep(60000);//checking rate : 1 per/min
                         }
                     }
@@ -143,75 +141,38 @@ public class UploadService extends Service {
     }
 
     public void stringBuildAppend(){
-        float sum = Math.abs(xValue)+Math.abs(yValue)+Math.abs(zValue);
         stringBuilder_acc.append("[");
-        stringBuilder_acc.append("index: ");
-        stringBuilder_acc.append(mCount);
-        stringBuilder_acc.append(", time: ");
+        stringBuilder_acc.append("time: ");
         stringBuilder_acc.append(time);
-        stringBuilder_acc.append(", sum: ");
-        stringBuilder_acc.append(sum);
-        stringBuilder_acc.append(", x: ");
-        stringBuilder_acc.append(xValue);
-        stringBuilder_acc.append(", y: ");
-        stringBuilder_acc.append(yValue);
-        stringBuilder_acc.append(", z: ");
-        stringBuilder_acc.append(zValue);
-        stringBuilder_acc.append(", latitude: ");
-        stringBuilder_acc.append(Lat);
-        stringBuilder_acc.append(", longitude: ");
-        stringBuilder_acc.append(Lon);
-        stringBuilder_acc.append(", address: ");
-        stringBuilder_acc.append(add);
+        stringBuilder_acc.append(", latitude and longitude: ");
+        stringBuilder_acc.append(latLng);
         stringBuilder_acc.append(", speed: ");
         stringBuilder_acc.append(speed);
-        stringBuilder_acc.append(", bearing ");
-        stringBuilder_acc.append(bearing);
+        stringBuilder_acc.append(", degree: ");
+        stringBuilder_acc.append(degree);
         stringBuilder_acc.append("]");
     }
 
     @Override
     public void onDestroy() {
-        sm.unregisterListener(myAccelerometerListener);
-        sm = null;
         if (mLocationManager != null) {
             // 移除 mLocationListener 監聽器
             mLocationManager.removeUpdates(mLocationListener);
             mLocationManager = null;
         }
+        sensor_manager.unregisterListener(listener);
         flag_mRun = false;
         super.onDestroy();
     }
-
-
-    final SensorEventListener myAccelerometerListener = new SensorEventListener(){
-
-        public void onSensorChanged(SensorEvent sensorEvent){
-            if(sensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER){
-                xValue = sensorEvent.values[0] / G;
-                yValue = sensorEvent.values[1] / G;
-                zValue = sensorEvent.values[2] / G;
-            }
-        }
-
-        public void onAccuracyChanged(Sensor sensor , int accuracy){
-            Log.i(TAG, "onAccuracyChanged");
-        }
-    };
-
 
     // 定位監聽器實作
     private class MyLocationListener implements LocationListener {
         // GPS位置資訊已更新
         public void onLocationChanged(Location location) {
-            LatLng latLng = new LatLng(location.getLatitude(),location.getLongitude());
-
+            latLng = new LatLng(location.getLatitude(),location.getLongitude());
             time = new Date(location.getTime());
-            Lat = location.getLatitude();
-            Lon = location.getLongitude();
-            add = GEOReverseHelper.getAddressByLatLng(latLng);
+            //add = GEOReverseHelper.getAddressByLatLng(latLng);
             speed = location.getSpeed()*3.6;
-            bearing = location.getBearing();
         }
         public void onProviderDisabled(String provider) {
         }
@@ -241,7 +202,54 @@ public class UploadService extends Service {
 
         Map<String, Object> childUpdates = new HashMap<>();
         childUpdates.put("posts/" + key,postValues);
-        childUpdates.put("user-post/" + "01" + "/" + key, postValues);
+        //childUpdates.put("user-post/" + "01" + "/" + key, postValues);
         mDatabase.updateChildren(childUpdates);
+    }
+
+    //轉向器
+    private class MySensorEventListener implements SensorEventListener {
+
+        private float[] accelerometerValues;
+        private float[] magneticFieldValues;
+
+        @Override
+        public void onSensorChanged(SensorEvent event) {
+            if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+                accelerometerValues = (float[]) event.values.clone();
+            } else if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
+                magneticFieldValues = (float[]) event.values.clone();
+            }
+            if (accelerometerValues != null && magneticFieldValues != null) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        // 計算方位
+                        calculateOrientation();
+                    }
+                });
+            }
+        }
+        @Override
+        public void onAccuracyChanged(Sensor arg0, int arg1) {
+            // TODO Auto-generated method stub
+        }
+
+        // 計算方位
+        private void calculateOrientation() {
+            //(-180~180) 0:正北，90:正東，180/-180:正南，-90:正西
+            float[] values = new float[3];
+            float[] inR = new float[9];
+            SensorManager.getRotationMatrix(inR, null, accelerometerValues, magneticFieldValues);
+
+            // 利用重映方向參考坐標系 (非必要)
+            float[] outR = new float[9];
+            SensorManager.remapCoordinateSystem(inR, SensorManager.AXIS_X, SensorManager.AXIS_Z, outR);
+
+            SensorManager.getOrientation(inR, values); // 第一個參數可以置換 inR 或 outR
+
+            values[0] = (float) Math.toDegrees(values[0]);
+            degree = values[0];
+        }
+
     }
 }
