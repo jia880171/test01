@@ -57,9 +57,6 @@ public class ShowGPS extends Fragment {
     private LocationListener mLocationListener;
     //轉向監視器
 
-//    private SensorManager sm ;
-//    private static final float G = 9.8F;
-
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
@@ -100,48 +97,56 @@ public class ShowGPS extends Fragment {
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
         context = getActivity().getApplicationContext();
-
-        //要求權限
-        ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
     }
 
 
-    // 獲得地理位置的更新資料 (GPS 與 NETWORK都註冊) 搭配ActivityCompat.requestPermissions
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-        switch (requestCode) {
-            case 1: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    mLocationManager.requestLocationUpdates(LM_GPS, 0, 0, mLocationListener);
-                    mLocationManager.requestLocationUpdates(LM_NETWORK, 0, 0, mLocationListener);
-                } else {
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
-                }
-                return;
-            }
-            // other 'case' lines to check for other
-            // permissions this app might request
-
-
-        }
-    }
+//    // 獲得地理位置的更新資料 (GPS 與 NETWORK都註冊) 搭配ActivityCompat.requestPermissions
+//    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+//        switch (requestCode) {
+//            case 1: {
+//                // If request is cancelled, the result arrays are empty.
+//                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//                    mLocationManager.requestLocationUpdates(LM_GPS, 0, 0, mLocationListener);
+//                    mLocationManager.requestLocationUpdates(LM_NETWORK, 0, 0, mLocationListener);
+//                } else {
+//                    // permission denied, boo! Disable the
+//                    // functionality that depends on this permission.
+//                }
+//                return;
+//            }
+//            // other 'case' lines to check for other
+//            // permissions this app might request
+//
+//
+//        }
+//    }
 
     @Override
     public void onResume() {
+
+//        //要求權限
+//        ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+
         if (mLocationManager == null) {
             mLocationManager =
                     (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
             mLocationListener = new MyLocationListener();
         }
 
-        sensor_manager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
-        // 方向偵測器
-        Sensor aSensor = sensor_manager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        Sensor mfSensor = sensor_manager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
-        listener = new MySensorEventListener();
-        sensor_manager.registerListener(listener, aSensor, SensorManager.SENSOR_DELAY_NORMAL);
-        sensor_manager.registerListener(listener, mfSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        if(sensor_manager == null){
+            sensor_manager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
+
+            mLocationManager.requestLocationUpdates(LM_GPS, 0, 0, mLocationListener);
+            mLocationManager.requestLocationUpdates(LM_NETWORK, 0, 0, mLocationListener);
+
+            // 方向偵測器
+            Sensor aSensor = sensor_manager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+            Sensor mfSensor = sensor_manager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+            listener = new MySensorEventListener();
+            sensor_manager.registerListener(listener, aSensor, SensorManager.SENSOR_DELAY_NORMAL);
+            sensor_manager.registerListener(listener, mfSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        }
+
 
         super.onResume();
     }
@@ -153,8 +158,9 @@ public class ShowGPS extends Fragment {
             mLocationManager.removeUpdates(mLocationListener);
             mLocationManager = null;
         }
-        sensor_manager.unregisterListener(listener);
-        //setTitle("onPause ...");
+        if(sensor_manager != null){
+            sensor_manager.unregisterListener(listener);
+        }
         super.onPause();
     }
 

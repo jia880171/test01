@@ -150,7 +150,7 @@ public class ShowSensorData extends Fragment{
             sm.registerListener(myAccelerometerListener,sm.getDefaultSensor(sensorType),SensorManager.SENSOR_DELAY_NORMAL);
         }
 
-        //set location manarger
+        //set location manager
         if (mLocationManager == null) {
             mLocationManager =
                     (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
@@ -191,85 +191,18 @@ public class ShowSensorData extends Fragment{
         button_start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 getActivity().startService(intent);
-//                flag_start = true;
-//                new Thread(mRun2 = new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        int mCount = 0;
-//                        stringBuilder_acc = new StringBuilder();
-//                        while (flag_start){
-//                            try {
-//                                Message msg = new Message();
-//                                mCount +=1 ;
-//                                msg.what = 1;
-//                                msg.arg1 = mCount;
-//                                mHandler2.sendMessage(msg);
-//                                Thread.sleep(500);
-//                                Log.d("Thread","count"+mCount);
-//                            }
-//                            catch (Exception e){
-//                            }
-//                        }
-//                    }
-//                }).start();
-//                mHandler2 = new Handler(){
-//                    @Override
-//                    public void handleMessage(Message msg) {
-//                        super.handleMessage(msg);
-//                        float sum = Math.abs(xValue)+Math.abs(yValue)+Math.abs(zValue);
-//                        stringBuilder_acc.append("[");
-//                        stringBuilder_acc.append("index: ");
-//                        stringBuilder_acc.append(msg.arg1);
-//                        stringBuilder_acc.append(", time: ");
-//                        stringBuilder_acc.append(time);
-//                        stringBuilder_acc.append(", sum: ");
-//                        stringBuilder_acc.append(sum);
-//                        stringBuilder_acc.append(", x: ");
-//                        stringBuilder_acc.append(xValue);
-//                        stringBuilder_acc.append(", y: ");
-//                        stringBuilder_acc.append(yValue);
-//                        stringBuilder_acc.append(", z: ");
-//                        stringBuilder_acc.append(zValue);
-//                        stringBuilder_acc.append(", latitude: ");
-//                        stringBuilder_acc.append(Lat);
-//                        stringBuilder_acc.append(", longitude: ");
-//                        stringBuilder_acc.append(Lon);
-//                        stringBuilder_acc.append(", address: ");
-//                        stringBuilder_acc.append(add);
-//                        stringBuilder_acc.append(", speed: ");
-//                        stringBuilder_acc.append(speed);
-//                        stringBuilder_acc.append(", bearing ");
-//                        stringBuilder_acc.append(bearing);
-//                        stringBuilder_acc.append("]");
-//
-//                        // 將記錄新增到coffee資料表的參數
-//                        ContentValues cv = new ContentValues();
-//                        cv.put("Time", true);
-//                        cv.put("Sum", sum);
-//                        cv.put("x", xValue);
-//                        cv.put("y", yValue);
-//                        cv.put("z", zValue);
-//                    }
-//                };
             }
         });
-        //button_start
 
 
         //button_stop
         button_stop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                flag_start=false;
-//                acc_record = stringBuilder_acc.toString();
-//                writeAccPost(acc_record);
                 getActivity().stopService(intent);
             }
         });
-        //button_stop
-
 
     }
 
@@ -348,28 +281,6 @@ public class ShowSensorData extends Fragment{
         TextViewValueZ.setText("z:"+zValue);
 
         return myInflatedView;
-    }
-
-
-    public double mLengthCaculate(Vector vector){
-        double length;
-        float temp_length = 0F;
-        for(int i=0; i<3; i++){
-            temp_length += (double)(float)vector.get(i) * (double) (float)vector.get(i);
-        }
-        length = Math.sqrt(temp_length);
-        return length;
-
-    }
-
-    public Vector mUnit(Vector vector){
-        Vector unit = new Vector();
-        double length = mLengthCaculate(vector);
-        for (int i=0; i<3; i++){
-            float x = (float)vector.get(i) / (float)length;
-            unit.add(x);
-        }
-        return unit;
     }
 
     public void onPause(){

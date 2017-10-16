@@ -115,16 +115,18 @@ public class UploadService extends Service {
                             Log.d("inService","recording...");
                             AppendJsonObject();
                             if(speed>5){
-                                Log.d("inService","set mCount to 0");
+                                Log.d("inService","speed >5, set mCount to 0");
                                 mCount=0;
                             } else if(speed<5){
                                 mCount = mCount +1;
-                                Log.d("inService","mCount:" + mCount);
+                                Log.d("inService","speed <5, mCount ++");
+                                Log.d("inService","mCount: " + mCount);
                                 if(mCount>=5){
                                     mCount=0;
                                     flagForRecording =false;
-                                    Log.d("inService","speed = " + speed);
-                                    Log.d("inService","speed <5, start uploading!");
+                                    Log.d("inService","mCount>=5, mCount: " + mCount);
+                                    Log.d("inService","speed: " + speed);
+                                    Log.d("inService","start uploading!");
                                     //acc_record = stringBuilder_acc.toString();
                                     writeToFirebase(JArray);//upload to fireBase
                                 }
