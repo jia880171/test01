@@ -67,6 +67,9 @@ public class ShowGPS extends Fragment {
     private MySensorEventListener listener = new MySensorEventListener();
     private TextView textView2;
 
+    Sensor aSensor;
+    Sensor mfSensor;
+
     //private OnFragmentInteractionListener mListener;
 
     public ShowGPS() {
@@ -146,19 +149,15 @@ public class ShowGPS extends Fragment {
 
         }
 
-
         if(sensor_manager == null){
             Log.d("in service","sensor_manager!!!!!!");
             sensor_manager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
-
             // 方向偵測器
-            Sensor aSensor = sensor_manager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-            Sensor mfSensor = sensor_manager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
-
-            sensor_manager.registerListener(listener, aSensor, SensorManager.SENSOR_DELAY_NORMAL);
-            sensor_manager.registerListener(listener, mfSensor, SensorManager.SENSOR_DELAY_NORMAL);
+            aSensor = sensor_manager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+            mfSensor = sensor_manager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
         }
-
+        sensor_manager.registerListener(listener, aSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        sensor_manager.registerListener(listener, mfSensor, SensorManager.SENSOR_DELAY_NORMAL);
 
         super.onResume();
     }
