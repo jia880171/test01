@@ -1,6 +1,7 @@
 package com.example.unick.sensordemo.fragments;
 
 import android.Manifest;
+import static android.Manifest.permission.*;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -16,6 +17,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -62,7 +64,7 @@ public class ShowGPS extends Fragment {
     private String mParam2;
 
     private SensorManager sensor_manager;
-    private MySensorEventListener listener;
+    private MySensorEventListener listener = new MySensorEventListener();
     private TextView textView2;
 
     //private OnFragmentInteractionListener mListener;
@@ -100,49 +102,59 @@ public class ShowGPS extends Fragment {
     }
 
 
-//    // 獲得地理位置的更新資料 (GPS 與 NETWORK都註冊) 搭配ActivityCompat.requestPermissions
-//    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-//        switch (requestCode) {
-//            case 1: {
-//                // If request is cancelled, the result arrays are empty.
-//                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//                    mLocationManager.requestLocationUpdates(LM_GPS, 0, 0, mLocationListener);
-//                    mLocationManager.requestLocationUpdates(LM_NETWORK, 0, 0, mLocationListener);
-//                } else {
-//                    // permission denied, boo! Disable the
-//                    // functionality that depends on this permission.
-//                }
-//                return;
-//            }
-//            // other 'case' lines to check for other
-//            // permissions this app might request
-//
-//
-//        }
-//    }
+    // 獲得地理位置的更新資料 (GPS 與 NETWORK都註冊) 搭配ActivityCompat.requestPermissions
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case 1: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    mLocationManager.requestLocationUpdates(LM_GPS, 0, 0, mLocationListener);
+                    mLocationManager.requestLocationUpdates(LM_NETWORK, 0, 0, mLocationListener);
+                } else {
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                }
+                return;
+            }
+            // other 'case' lines to check for other
+            // permissions this app might request
+
+
+        }
+    }
 
     @Override
     public void onResume() {
 
-//        //要求權限
-//        ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+        //要求權限
+        int permission = ActivityCompat.checkSelfPermission(getActivity(),
+                Manifest.permission.ACCESS_FINE_LOCATION);
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            // 無權限，向使用者請求
+            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+        }else{
+            //已有權限，執行儲存程式
 
-        if (mLocationManager == null) {
-            mLocationManager =
-                    (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-            mLocationListener = new MyLocationListener();
-        }
-
-        if(sensor_manager == null){
-            sensor_manager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
+            if (mLocationManager == null) {
+                mLocationManager =
+                        (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+                mLocationListener = new MyLocationListener();
+            }
 
             mLocationManager.requestLocationUpdates(LM_GPS, 0, 0, mLocationListener);
             mLocationManager.requestLocationUpdates(LM_NETWORK, 0, 0, mLocationListener);
 
+        }
+
+
+        if(sensor_manager == null){
+            Log.d("in service","sensor_manager!!!!!!");
+            sensor_manager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
+
             // 方向偵測器
             Sensor aSensor = sensor_manager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
             Sensor mfSensor = sensor_manager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
-            listener = new MySensorEventListener();
+
             sensor_manager.registerListener(listener, aSensor, SensorManager.SENSOR_DELAY_NORMAL);
             sensor_manager.registerListener(listener, mfSensor, SensorManager.SENSOR_DELAY_NORMAL);
         }
@@ -234,11 +246,15 @@ public class ShowGPS extends Fragment {
 
         @Override
         public void onSensorChanged(SensorEvent event) {
+            Log.d("in service","lepu accelerometerValues: "+accelerometerValues);
+            Log.d("in service","lepu magneticFieldValues: "+magneticFieldValues);
             if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-                accelerometerValues = (float[]) event.values.clone();
+                accelerometerValues = event.values.clone();
             } else if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
-                magneticFieldValues = (float[]) event.values.clone();
+                magneticFieldValues = event.values.clone();
             }
+            Log.d("in service","lepu accelerometerValues: "+accelerometerValues);
+            Log.d("in service","lepu magneticFieldValues: "+magneticFieldValues);
 
             if (accelerometerValues != null && magneticFieldValues != null) {
                 runOnUiThread(new Runnable() {
@@ -275,9 +291,10 @@ public class ShowGPS extends Fragment {
 
             values[0] = (float) Math.toDegrees(values[0]);
             float degress = values[0];
-            textView2.setText("Degress:" + degress);
+
+            textView2.setText("Degrees:" + degress);
             if (values[0] >= -5 && values[0] < 5) {
-                textView2.setText("Degress:" + degress + "\n正北");
+                textView2.setText("Degrees:" + degress + "\n正北");
             } else if (values[0] >= 40 && values[0] < 50) {
                 textView2.setText("Degress:" + degress + "\n東北");
             } else if (values[0] >= 85 && values[0] <= 95) {
