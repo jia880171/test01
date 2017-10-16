@@ -90,6 +90,13 @@ public class MainActivity extends AppCompatActivity
         };
     }
 
+    //call back function
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        String username = data.getStringExtra("username");
+    }
+
     @Override
     protected void onStart() {
         super.onStart();

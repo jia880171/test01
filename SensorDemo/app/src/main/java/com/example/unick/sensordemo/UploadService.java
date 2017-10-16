@@ -1,7 +1,6 @@
 package com.example.unick.sensordemo;
 
 import android.app.Service;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.hardware.Sensor;
@@ -13,23 +12,23 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.example.unick.sensordemo.fragments.ShowSensorData;
 import com.example.unick.sensordemo.models.AccPost;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import static android.content.ContentValues.TAG;
 import static com.google.android.gms.internal.zzagz.runOnUiThread;
 
 /**
@@ -62,9 +61,12 @@ public class UploadService extends Service {
     private float degree;
 
     Runnable mRun;
-    private boolean flag_mRun;
-    private boolean flag_recording;
+    private boolean flagFormRun;
+    private boolean flagForRecording;
     private boolean flag_have_record;
+
+    //生成一個JsonArray
+    JSONArray JArray = new JSONArray();
 
 
     @Override
@@ -97,20 +99,21 @@ public class UploadService extends Service {
 
         //thread for checking speed
         stringBuilder_acc = new StringBuilder();
-        flag_mRun = true;
+        flagFormRun = true;
         flag_have_record = false;
         new Thread(mRun = new Runnable() {
             @Override
             public void run() {
-                while (flag_mRun){
+                while (flagFormRun){
                     try {
-                        if(flag_recording==false && speed>=15){
-                            flag_recording=true;
+                        //----------------------------------------------------------------------real code
+                        if(flagForRecording ==false && speed>=15){
+                            flagForRecording =true;
                             Log.d("inService","speed >= 15, start recording!");
-                        } else if(flag_recording){
+                        } else if(flagForRecording){
                             Log.d("inService","speed = " + speed);
                             Log.d("inService","recording...");
-                            stringBuildAppend();
+                            AppendJsonObject();
                             if(speed>5){
                                 Log.d("inService","set mCount to 0");
                                 mCount=0;
@@ -118,11 +121,12 @@ public class UploadService extends Service {
                                 mCount = mCount +1;
                                 Log.d("inService","mCount:" + mCount);
                                 if(mCount>=5){
-                                    flag_recording=false;
+                                    mCount=0;
+                                    flagForRecording =false;
                                     Log.d("inService","speed = " + speed);
                                     Log.d("inService","speed <5, start uploading!");
-                                    acc_record = stringBuilder_acc.toString();
-                                    writeAccPost(acc_record);//upload to fireBase
+                                    //acc_record = stringBuilder_acc.toString();
+                                    writeToFirebase(JArray);//upload to fireBase
                                 }
                             }
                             Thread.sleep(500);//record rate : 2 per/sec
@@ -131,6 +135,24 @@ public class UploadService extends Service {
                             stringBuilder_acc = new StringBuilder();
                             Thread.sleep(60000);//checking rate : 1 per/min
                         }
+                        //----------------------------------------------------------------------real code
+
+                        //----------------------------------------------------------------------test
+//                        if(mCount >=10){
+//                            Log.d("mCount>=10","!!!!");
+//                            mCount = 0;
+//                            //acc_record = stringBuilder_acc.toString();
+//                            //writeAccPost(acc_record);
+//                            writeAccPost(JArray.toString());
+//                        }
+//                        mCount = mCount +1;
+//                        Log.d("uploadService","mCount: " + mCount);
+//                        Log.d("uploadService","latLng: " + latLng);
+//                        //stringBuildAppend();
+//                        AppendJasonObject();
+//                        Thread.sleep(500);//record rate : 2 per/sec
+                        //----------------------------------------------------------------------test
+
                     }
                     catch (Exception e){
                     }
@@ -140,30 +162,61 @@ public class UploadService extends Service {
         return Service.START_STICKY;
     }
 
-    public void stringBuildAppend(){
-        stringBuilder_acc.append("[");
-        stringBuilder_acc.append("time: ");
-        stringBuilder_acc.append(time);
-        stringBuilder_acc.append(", latitude and longitude: ");
-        stringBuilder_acc.append(latLng);
-        stringBuilder_acc.append(", speed: ");
-        stringBuilder_acc.append(speed);
-        stringBuilder_acc.append(", degree: ");
-        stringBuilder_acc.append(degree);
-        stringBuilder_acc.append("]");
+//    public void AppendString(){
+//        stringBuilder_acc.append("[");
+//        stringBuilder_acc.append("time: ");
+//        stringBuilder_acc.append(time);
+//        stringBuilder_acc.append(", latitude and longitude: ");
+//        stringBuilder_acc.append(latLng);
+//        stringBuilder_acc.append(", speed: ");
+//        stringBuilder_acc.append(speed);
+//        stringBuilder_acc.append(", degree: ");
+//        stringBuilder_acc.append(degree);
+//        stringBuilder_acc.append("]");
+//    }
+    public void AppendJsonObject(){
+        JSONObject jsonObj =new JSONObject();
+        try {
+            jsonObj.put("time", time);
+            jsonObj.put("latLng", latLng);
+            jsonObj.put("speed", speed);
+            jsonObj.put("degree", degree);
+            JArray.put(jsonObj);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
-    @Override
-    public void onDestroy() {
-        if (mLocationManager != null) {
-            // 移除 mLocationListener 監聽器
-            mLocationManager.removeUpdates(mLocationListener);
-            mLocationManager = null;
+//    private void writeToFirebase(String body){
+//        String key = mDatabase.child("posts").push().getKey();
+//        Log.d("uploadService","write acc key:"+key);
+//        AccPost post = new AccPost("01", body);
+//        //01 need to be change to UID
+//        Map<String, Object> postValues = post.toMap();
+//        Map<String, Object> childUpdates = new HashMap<>();
+//        childUpdates.put("posts/" + key,postValues);
+//        mDatabase.updateChildren(childUpdates);
+//    }
+
+    private void writeToFirebase(JSONArray jsonArray){
+        try {
+            Log.d("uploadService","write to fireBase ,Jason:" + jsonArray);
+            String key = mDatabase.child("posts").push().getKey();
+            Log.d("uploadService","write acc key:"+key);
+            AccPost post = new AccPost("01", jsonArray);
+            //01 need to be change to UID
+            Map<String, Object> postValues = post.toMap();
+            Map<String, Object> childUpdates = new HashMap<>();
+            childUpdates.put("posts/" + key,postValues);
+            mDatabase.updateChildren(childUpdates);
+        } catch (Exception e){
+            Log.d("firebase","lepu" + e);
+            e.printStackTrace();
         }
-        sensor_manager.unregisterListener(listener);
-        flag_mRun = false;
-        super.onDestroy();
+
     }
+
+
 
     // 定位監聽器實作
     private class MyLocationListener implements LocationListener {
@@ -194,17 +247,6 @@ public class UploadService extends Service {
             }
         }
     }//end of 定位監聽器實作
-
-    private void writeAccPost(String body){
-        String key = mDatabase.child("posts").push().getKey();
-        AccPost post = new AccPost("01", body);
-        Map<String, Object> postValues = post.toMap();
-
-        Map<String, Object> childUpdates = new HashMap<>();
-        childUpdates.put("posts/" + key,postValues);
-        //childUpdates.put("user-post/" + "01" + "/" + key, postValues);
-        mDatabase.updateChildren(childUpdates);
-    }
 
     //轉向器
     private class MySensorEventListener implements SensorEventListener {
@@ -250,6 +292,17 @@ public class UploadService extends Service {
             values[0] = (float) Math.toDegrees(values[0]);
             degree = values[0];
         }
+    }
 
+    @Override
+    public void onDestroy() {
+        if (mLocationManager != null) {
+            // 移除 mLocationListener 監聽器
+            mLocationManager.removeUpdates(mLocationListener);
+            mLocationManager = null;
+        }
+        sensor_manager.unregisterListener(listener);
+        flagFormRun = false;
+        super.onDestroy();
     }
 }

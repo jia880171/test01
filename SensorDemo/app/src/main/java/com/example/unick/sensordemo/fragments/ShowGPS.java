@@ -1,7 +1,9 @@
 package com.example.unick.sensordemo.fragments;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -12,6 +14,7 @@ import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -97,6 +100,31 @@ public class ShowGPS extends Fragment {
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
         context = getActivity().getApplicationContext();
+
+        //要求權限
+        ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+    }
+
+
+    // 獲得地理位置的更新資料 (GPS 與 NETWORK都註冊) 搭配ActivityCompat.requestPermissions
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case 1: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    mLocationManager.requestLocationUpdates(LM_GPS, 0, 0, mLocationListener);
+                    mLocationManager.requestLocationUpdates(LM_NETWORK, 0, 0, mLocationListener);
+                } else {
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                }
+                return;
+            }
+            // other 'case' lines to check for other
+            // permissions this app might request
+
+
+        }
     }
 
     @Override
@@ -106,25 +134,14 @@ public class ShowGPS extends Fragment {
                     (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
             mLocationListener = new MyLocationListener();
         }
-        // 獲得地理位置的更新資料 (GPS 與 NETWORK都註冊)
-        mLocationManager.requestLocationUpdates(LM_GPS, 0, 0, mLocationListener);
-        mLocationManager.requestLocationUpdates(LM_NETWORK, 0, 0, mLocationListener);
-        //setTitle("onResume ...");
-
 
         sensor_manager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
         // 方向偵測器
-        Sensor aSensor = sensor_manager
-                .getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-
-        Sensor mfSensor = sensor_manager
-                .getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
-
+        Sensor aSensor = sensor_manager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        Sensor mfSensor = sensor_manager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
         listener = new MySensorEventListener();
-        sensor_manager.registerListener(listener, aSensor,
-                SensorManager.SENSOR_DELAY_NORMAL);
-        sensor_manager.registerListener(listener, mfSensor,
-                SensorManager.SENSOR_DELAY_NORMAL);
+        sensor_manager.registerListener(listener, aSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        sensor_manager.registerListener(listener, mfSensor, SensorManager.SENSOR_DELAY_NORMAL);
 
         super.onResume();
     }

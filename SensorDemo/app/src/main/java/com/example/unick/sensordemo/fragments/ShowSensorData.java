@@ -35,6 +35,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import org.json.JSONArray;
+
 import java.lang.reflect.Array;
 import java.util.Date;
 import java.util.HashMap;
@@ -305,9 +307,9 @@ public class ShowSensorData extends Fragment{
         }
     }
 
-    private void writeAccPost(String body){
+    private void writeAccPost(JSONArray jsonArray){
         String key = mDatabase.child("posts").push().getKey();
-        AccPost post = new AccPost("01", body);
+        AccPost post = new AccPost("01", jsonArray);
         Map<String, Object> postValues = post.toMap();
 
         Map<String, Object> childUpdates = new HashMap<>();

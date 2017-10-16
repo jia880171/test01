@@ -41,7 +41,7 @@ public class LoginActivity extends AppCompatActivity {
                     Log.d("onAuthStateChanged", "登入："+user.getUid());
                     userUID = user.getUid();
                     Intent intent = new Intent();
-                    intent.putExtra("fuck",UserName);
+                    intent.putExtra("username",UserName);
                     LoginActivity.this.setResult(RESULT_OK, intent);
                     LoginActivity.this.finish();
                 }
