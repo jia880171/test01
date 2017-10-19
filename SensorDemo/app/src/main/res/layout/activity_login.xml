@@ -42,14 +42,23 @@
         </android.support.design.widget.TextInputLayout>
 
         <Button
-            android:id="@+id/email_sign_in_button"
+            android:id="@+id/email_login_button"
             style="?android:textAppearanceSmall"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="Sign in"
+            android:text="登入 login"
             android:textStyle="bold"
             android:onClick="logIn"/>
+        <Button
+            android:id="@+id/button_goToSignUpActivity"
+            style="?android:textAppearanceSmall"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="註冊 sign up"
+            android:textStyle="bold"
+            android:onClick="goToSignUp"/>
 
     </LinearLayout>
 

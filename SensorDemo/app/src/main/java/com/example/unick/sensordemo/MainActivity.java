@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        displaySelectedScreen(R.id.nav_SensorLists);
+        displaySelectedScreen(R.id.nav_ShowGPS);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -164,9 +164,9 @@ public class MainActivity extends AppCompatActivity
 
         //initializing the fragment object which is selected
         switch (itemId) {
-            case R.id.nav_SensorLists:
-                fragment = new SensorLists();
-                break;
+//            case R.id.nav_SensorLists:
+//                fragment = new SensorLists();
+//                break;
             case R.id.nav_ShowSensorData:
                 fragment = new ShowSensorData();
                 break;

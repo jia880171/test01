@@ -107,12 +107,12 @@ public class ShowGPS extends Fragment {
 
     // 獲得地理位置的更新資料 (GPS 與 NETWORK都註冊) 搭配ActivityCompat.requestPermissions
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        Log.d("lepu in service", "permission granted on request");
         switch (requestCode) {
             case 1: {
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    mLocationManager.requestLocationUpdates(LM_GPS, 0, 0, mLocationListener);
-                    mLocationManager.requestLocationUpdates(LM_NETWORK, 0, 0, mLocationListener);
+                    Log.d("lepu in service", "permission granted on request");
                 } else {
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
@@ -134,14 +134,16 @@ public class ShowGPS extends Fragment {
                 Manifest.permission.ACCESS_FINE_LOCATION);
         if (permission != PackageManager.PERMISSION_GRANTED) {
             // 無權限，向使用者請求
-            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+            Log.d("lepu in service", "ask permission");
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
         }else{
             //已有權限，執行儲存程式
-
+            Log.d("lepu in service", "have permission");
             if (mLocationManager == null) {
                 mLocationManager =
                         (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
                 mLocationListener = new MyLocationListener();
+                Log.d("lepu in service", "have permission new locatio manager");
             }
 
             mLocationManager.requestLocationUpdates(LM_GPS, 0, 0, mLocationListener);
@@ -150,7 +152,6 @@ public class ShowGPS extends Fragment {
         }
 
         if(sensor_manager == null){
-            Log.d("in service","sensor_manager!!!!!!");
             sensor_manager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
             // 方向偵測器
             aSensor = sensor_manager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -245,16 +246,11 @@ public class ShowGPS extends Fragment {
 
         @Override
         public void onSensorChanged(SensorEvent event) {
-            Log.d("in service","lepu accelerometerValues: "+accelerometerValues);
-            Log.d("in service","lepu magneticFieldValues: "+magneticFieldValues);
             if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
                 accelerometerValues = event.values.clone();
             } else if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
                 magneticFieldValues = event.values.clone();
             }
-            Log.d("in service","lepu accelerometerValues: "+accelerometerValues);
-            Log.d("in service","lepu magneticFieldValues: "+magneticFieldValues);
-
             if (accelerometerValues != null && magneticFieldValues != null) {
                 runOnUiThread(new Runnable() {
                     @Override
