@@ -28,6 +28,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -243,7 +244,9 @@ public class UploadService extends Service {
         //01 need to be change to UID
         Map<String, Object> postValues = post.toMap();
         Map<String, Object> childUpdates = new HashMap<>();
-        childUpdates.put("posts3/" + key,postValues);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+
+        childUpdates.put("data/" + sdf.format(new Date()) + "/" + "01/" + key,postValues);
         mDatabase.updateChildren(childUpdates);
     }
 
