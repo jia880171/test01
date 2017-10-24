@@ -21,6 +21,7 @@ import android.util.Log;
 import com.example.unick.sensordemo.models.AccPost;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.vision.barcode.Barcode;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -246,7 +247,7 @@ public class UploadService extends Service {
         Map<String, Object> childUpdates = new HashMap<>();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
 
-        childUpdates.put("data/" + sdf.format(new Date()) + "/" + "01/" + key,postValues);
+        childUpdates.put("data/" + sdf.format(new Date()) + "/" + FirebaseAuth.getInstance().getCurrentUser().getUid() + "/" + key,postValues);
         mDatabase.updateChildren(childUpdates);
     }
 
