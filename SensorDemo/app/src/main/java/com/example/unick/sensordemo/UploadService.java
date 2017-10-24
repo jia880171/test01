@@ -7,10 +7,12 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.icu.util.Calendar;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
+import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
@@ -18,6 +20,7 @@ import android.util.Log;
 
 import com.example.unick.sensordemo.models.AccPost;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.vision.barcode.Barcode;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -46,6 +49,8 @@ public class UploadService extends Service {
     public final String LM_GPS = LocationManager.GPS_PROVIDER;
     public final String LM_NETWORK = LocationManager.NETWORK_PROVIDER;
 
+    private final IBinder mBinder = new LocalBinder();
+    public int transportType=0;
     private int mCount=0;
     // 定位管理器
     private LocationManager mLocationManager;
@@ -54,6 +59,9 @@ public class UploadService extends Service {
     private LatLng latLng;
     //private String add;
     private Date time;
+
+    private long timeInMilli;
+
     private Double speed = 0.0;
     //轉向器
     private SensorManager sensor_manager;
@@ -66,12 +74,45 @@ public class UploadService extends Service {
     private boolean flag_have_record;
 
     //生成一個JsonArray
-    JSONArray JArray = new JSONArray();
+    JSONArray JArray;
 
+
+    public class LocalBinder extends Binder {
+        public UploadService getService() {
+            // Return this instance of LocalService so clients can call public methods
+            return UploadService.this;
+        }
+    }
 
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        return mBinder;
+    }
+
+    public void setTransportType(String type){
+        switch (type){
+            case "drive":
+                transportType = 0;
+                break;
+            case "lift":
+                transportType = 1;
+                break;
+            case "bus":
+                transportType = 2;
+                break;
+            case "mrt":
+                transportType = 3;
+                break;
+            case "taxi":
+                transportType = 4;
+                break;
+            case "motor":
+                transportType = 5;
+                break;
+            case "train":
+                transportType = 6;
+                break;
+        }
     }
 
     @Override
@@ -101,6 +142,7 @@ public class UploadService extends Service {
         stringBuilder_acc = new StringBuilder();
         flagFormRun = true;
         flag_have_record = false;
+        JArray = new JSONArray();
         new Thread(mRun = new Runnable() {
             @Override
             public void run() {
@@ -113,6 +155,7 @@ public class UploadService extends Service {
                         } else if(flagForRecording){
                             Log.d("inService","speed = " + speed);
                             Log.d("inService","recording...");
+                            timeInMilli = System.currentTimeMillis();
                             AppendJsonObject();
                             if(speed>5){
                                 Log.d("inService","speed >5, set mCount to 0");
@@ -128,7 +171,8 @@ public class UploadService extends Service {
                                     Log.d("inService","speed: " + speed);
                                     Log.d("inService","start uploading!");
                                     //acc_record = stringBuilder_acc.toString();
-                                    writeToFirebase(JArray);//upload to fireBase
+                                    writeToFirebase(JArray.toString());//upload to fireBase
+                                    JArray = new JSONArray();
                                 }
                             }
                             Thread.sleep(500);//record rate : 2 per/sec
@@ -145,13 +189,15 @@ public class UploadService extends Service {
 //                            mCount = 0;
 //                            //acc_record = stringBuilder_acc.toString();
 //                            //writeAccPost(acc_record);
-//                            writeAccPost(JArray.toString());
+//                            writeToFirebase(JArray.toString());
+//                            JArray = new JSONArray();
 //                        }
 //                        mCount = mCount +1;
 //                        Log.d("uploadService","mCount: " + mCount);
+//                        Log.d("uploadService","transportation type" + transportType);
 //                        Log.d("uploadService","latLng: " + latLng);
-//                        //stringBuildAppend();
-//                        AppendJasonObject();
+//                        timeInMilli = System.currentTimeMillis();
+//                        AppendJsonObject();
 //                        Thread.sleep(500);//record rate : 2 per/sec
                         //----------------------------------------------------------------------test
 
@@ -179,44 +225,45 @@ public class UploadService extends Service {
     public void AppendJsonObject(){
         JSONObject jsonObj =new JSONObject();
         try {
-            jsonObj.put("time", time);
+            jsonObj.put("time", timeInMilli);
             jsonObj.put("latLng", latLng);
             jsonObj.put("speed", speed);
             jsonObj.put("degree", degree);
+            jsonObj.put("type", transportType);
             JArray.put(jsonObj);
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 
-//    private void writeToFirebase(String body){
-//        String key = mDatabase.child("posts").push().getKey();
-//        Log.d("uploadService","write acc key:"+key);
-//        AccPost post = new AccPost("01", body);
-//        //01 need to be change to UID
-//        Map<String, Object> postValues = post.toMap();
-//        Map<String, Object> childUpdates = new HashMap<>();
-//        childUpdates.put("posts/" + key,postValues);
-//        mDatabase.updateChildren(childUpdates);
-//    }
-
-    private void writeToFirebase(JSONArray jsonArray){
-        try {
-            Log.d("uploadService","write to fireBase ,Jason:" + jsonArray);
-            String key = mDatabase.child("posts").push().getKey();
-            Log.d("uploadService","write acc key:"+key);
-            AccPost post = new AccPost("01", jsonArray);
-            //01 need to be change to UID
-            Map<String, Object> postValues = post.toMap();
-            Map<String, Object> childUpdates = new HashMap<>();
-            childUpdates.put("posts/" + key,postValues);
-            mDatabase.updateChildren(childUpdates);
-        } catch (Exception e){
-            Log.d("firebase","lepu" + e);
-            e.printStackTrace();
-        }
-
+    private void writeToFirebase(String body){
+        String key = mDatabase.child("posts3/").push().getKey();
+        Log.d("uploadService","write acc key:"+key);
+        AccPost post = new AccPost("01", body);
+        //01 need to be change to UID
+        Map<String, Object> postValues = post.toMap();
+        Map<String, Object> childUpdates = new HashMap<>();
+        childUpdates.put("posts3/" + key,postValues);
+        mDatabase.updateChildren(childUpdates);
     }
+
+//    private void writeToFirebase(JSONArray jsonArray){
+//        try {
+//            Log.d("uploadService","write to fireBase ,Jason:" + jsonArray);
+//            String key = mDatabase.child("posts").push().getKey();
+//            Log.d("uploadService","write acc key:"+key);
+//            AccPost post = new AccPost("01", jsonArray);
+//            //01 need to be change to UID
+//            Map<String, Object> postValues = post.toMap();
+//            Map<String, Object> childUpdates = new HashMap<>();
+//            childUpdates.put("posts/" + key,postValues);
+//            mDatabase.updateChildren(childUpdates);
+//        } catch (Exception e){
+//            Log.d("firebase","lepu" + e);
+//            e.printStackTrace();
+//        }
+//
+//    }
 
 
 
@@ -259,9 +306,9 @@ public class UploadService extends Service {
         @Override
         public void onSensorChanged(SensorEvent event) {
             if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-                accelerometerValues = (float[]) event.values.clone();
+                accelerometerValues = event.values.clone();
             } else if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
-                magneticFieldValues = (float[]) event.values.clone();
+                magneticFieldValues = event.values.clone();
             }
             if (accelerometerValues != null && magneticFieldValues != null) {
                 runOnUiThread(new Runnable() {
@@ -303,8 +350,11 @@ public class UploadService extends Service {
             mLocationManager.removeUpdates(mLocationListener);
             mLocationManager = null;
         }
-        sensor_manager.unregisterListener(listener);
-        flagFormRun = false;
+        if(sensor_manager != null){
+            sensor_manager.unregisterListener(listener);
+            flagFormRun = false;
+        }
+
         super.onDestroy();
     }
 }

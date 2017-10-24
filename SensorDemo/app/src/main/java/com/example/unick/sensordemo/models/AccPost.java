@@ -42,9 +42,6 @@ public class AccPost {
         }else{
             result.put("jsonArray", jsonArray);
         }
-//        result.put("starCount", starCount);
-//        result.put("stars", stars);
-
         return result;
     }
 }

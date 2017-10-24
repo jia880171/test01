@@ -27,6 +27,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.example.unick.sensordemo.fragments.SensorLists;
+import com.example.unick.sensordemo.fragments.ServiceContralFragment;
 import com.example.unick.sensordemo.fragments.ShowGPS;
 import com.example.unick.sensordemo.fragments.ShowSensorData;
 import com.google.firebase.auth.FirebaseAuth;
@@ -160,13 +161,16 @@ public class MainActivity extends AppCompatActivity
     private void displaySelectedScreen(int itemId) {
 
         //creating fragment object
-        Fragment fragment = new SensorLists();
+        Fragment fragment = new ServiceContralFragment();
 
         //initializing the fragment object which is selected
         switch (itemId) {
 //            case R.id.nav_SensorLists:
 //                fragment = new SensorLists();
 //                break;
+            case R.id.nav＿ServiceControl:
+                fragment = new ServiceContralFragment();
+                break;
             case R.id.nav_ShowSensorData:
                 fragment = new ShowSensorData();
                 break;

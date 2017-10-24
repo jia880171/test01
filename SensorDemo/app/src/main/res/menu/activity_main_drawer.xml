@@ -7,6 +7,10 @@
             <!--android:icon="@drawable/ic_menu_camera"-->
             <!--android:title="SensorList" />-->
         <item
+            android:id="@+id/nav＿ServiceControl"
+            android:icon="@drawable/ic_menu_gallery"
+            android:title="設定GPS背景服務" />
+        <item
             android:id="@+id/nav_ShowSensorData"
             android:icon="@drawable/ic_menu_gallery"
             android:title="show sensors's data" />
