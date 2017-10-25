@@ -1,11 +1,17 @@
 package com.example.unick.sensordemo.fragments;
 
 import android.app.Notification;
+import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.location.LocationProvider;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -17,9 +23,25 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.unick.sensordemo.GEOReverseHelper;
 import com.example.unick.sensordemo.R;
+import com.example.unick.sensordemo.UploadService;
+import com.example.unick.sensordemo.models.AccPost;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import org.json.JSONArray;
+
+import java.lang.reflect.Array;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Vector;
 
 import static android.content.ContentValues.TAG;
 
@@ -41,31 +63,48 @@ public class ShowSensorData extends Fragment{
     private String mParam1;
     private String mParam2;
 
-    private SensorManager sm = null;
+
+    private DatabaseReference mDatabase;
+    private SensorManager sm ;
+    private static final float G = 9.8F;
+
+    private StringBuilder stringBuilder_acc;
+    private String acc_record;
 
     float xValue;
     float yValue;
     float zValue;
+
+    public final String LM_GPS = LocationManager.GPS_PROVIDER;
+    public final String LM_NETWORK = LocationManager.NETWORK_PROVIDER;
+    // 定位管理器
+    private LocationManager mLocationManager;
+    // 定位監聽器
+    private LocationListener mLocationListener;
+    private Double Lat;
+    private Double Lon;
+    private String add;
+    private Date time;
+    private Double speed;
+    private float bearing;
+
+
     TextView TextViewValueX;
     TextView TextViewValueY;
     TextView TextViewValueZ;
+    Button button_start;
+    Button button_stop;
     Handler mHandler;
     Runnable mRun;
+
+    Handler mHandler2;
+    Runnable mRun2;
+
     boolean flagFormRun=true;
-//    private OnFragmentInteractionListener mListener;
 
-//    final Runnable runnable = new Runnable() {
-//        @Override
-//        public void run() {
-//            TextViewValue.setText("x:"+xValue+"y:"+yValue+"z:"+zValue);
-//            try {
-//                Thread.sleep(500);
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//    };
+    boolean flag_start=false;
 
+    private Intent intent;
 
     public ShowSensorData() {
         // Required empty public constructor
@@ -92,14 +131,37 @@ public class ShowSensorData extends Fragment{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
-        sm = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
-        int sensorType = Sensor.TYPE_ACCELEROMETER;
-        sm.registerListener(myAccelerometerListener,sm.getDefaultSensor(sensorType),SensorManager.SENSOR_DELAY_NORMAL);
+        intent = new Intent(getActivity(), UploadService.class);
+    }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(sm == null){
+            sm = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
+            int sensorType = Sensor.TYPE_ACCELEROMETER;
+            sm.registerListener(myAccelerometerListener,sm.getDefaultSensor(sensorType),SensorManager.SENSOR_DELAY_NORMAL);
+        }
+
+        //set location manager
+        if (mLocationManager == null) {
+            mLocationManager =
+                    (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+            mLocationListener = new MyLocationListener();
+        }
+        // 獲得地理位置的更新資料 (GPS 與 NETWORK都註冊)
+        mLocationManager.requestLocationUpdates(LM_GPS, 0, 0, mLocationListener);
+        mLocationManager.requestLocationUpdates(LM_NETWORK, 0, 0, mLocationListener);
+        //setTitle("onResume ...");
+
+        flagFormRun=true;
         new Thread(mRun = new Runnable() {
             @Override
             public void run() {
@@ -108,20 +170,14 @@ public class ShowSensorData extends Fragment{
                         Message msg = new Message();
                         msg.what = 1;
                         mHandler.sendMessage(msg);
-                        Log.d("in show sensor data", "runing");
                         Thread.sleep(100);
                     }
                     catch (Exception e){
-
                     }
                 }
             }
-
-
         }).start();
         mHandler = new Handler(){
-            int i = 0;
-
             @Override
             public void handleMessage(Message msg) {
                 TextViewValueX.setText("x:"+xValue);
@@ -131,25 +187,80 @@ public class ShowSensorData extends Fragment{
             }
         };
 
+        //button_start
+        button_start.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getActivity().startService(intent);
+            }
+        });
+
+
+        //button_stop
+        button_stop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getActivity().stopService(intent);
+            }
+        });
+
+    }
+
+    // 定位監聽器實作
+    private class MyLocationListener implements LocationListener {
+        // GPS位置資訊已更新
+        public void onLocationChanged(Location location) {
+            LatLng latLng = new LatLng(location.getLatitude(),location.getLongitude());
+
+            time = new Date(location.getTime());
+            Lat = location.getLatitude();
+            Lon = location.getLongitude();
+            add = GEOReverseHelper.getAddressByLatLng(latLng);
+            speed = location.getSpeed()*3.6;
+            bearing = location.getBearing();
+        }
+        public void onProviderDisabled(String provider) {
+        }
+
+        public void onProviderEnabled(String provider) {
+        }
+        // GPS位置資訊的狀態被更新
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+            switch (status) {
+                case LocationProvider.AVAILABLE:
+                    //setTitle("服務中");
+                    break;
+                case LocationProvider.OUT_OF_SERVICE:
+                    //setTitle("沒有服務");
+                    break;
+                case LocationProvider.TEMPORARILY_UNAVAILABLE:
+                    //setTitle("暫時不可使用");
+                    break;
+            }
+        }
+    }
+
+    private void writeAccPost(JSONArray jsonArray){
+        String key = mDatabase.child("posts").push().getKey();
+        AccPost post = new AccPost("01", jsonArray);
+        Map<String, Object> postValues = post.toMap();
+
+        Map<String, Object> childUpdates = new HashMap<>();
+        childUpdates.put("posts/" + key,postValues);
+        childUpdates.put("user-post/" + "01" + "/" + key, postValues);
+        mDatabase.updateChildren(childUpdates);
     }
 
     final SensorEventListener myAccelerometerListener = new SensorEventListener(){
 
-        //复写onSensorChanged方法
         public void onSensorChanged(SensorEvent sensorEvent){
             if(sensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER){
-                Log.i(TAG,"onSensorChanged");
-
-                //图解中已经解释三个值的含义
-                float X_lateral = xValue = sensorEvent.values[0];
-                float Y_longitudinal = yValue = sensorEvent.values[1];
-                float Z_vertical = zValue = sensorEvent.values[2];
-                Log.i(TAG,"\n heading "+X_lateral);
-                Log.i(TAG,"\n pitch "+Y_longitudinal);
-                Log.i(TAG,"\n roll "+Z_vertical);
+                xValue = sensorEvent.values[0] / G;
+                yValue = sensorEvent.values[1] / G;
+                zValue = sensorEvent.values[2] / G;
             }
         }
-        //复写onAccuracyChanged方法
+
         public void onAccuracyChanged(Sensor sensor , int accuracy){
             Log.i(TAG, "onAccuracyChanged");
         }
@@ -158,16 +269,17 @@ public class ShowSensorData extends Fragment{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
-        // Inflate the layout for this fragment
         View myInflatedView = inflater.inflate(R.layout.fragment_show_sensor_data,container,false);
         TextViewValueX = (TextView) myInflatedView.findViewById(R.id.tvx);
         TextViewValueY = (TextView) myInflatedView.findViewById(R.id.tvy);
         TextViewValueZ = (TextView) myInflatedView.findViewById(R.id.tvz);
+        button_start = (Button) myInflatedView.findViewById(R.id.button_start);
+        button_stop = (Button) myInflatedView.findViewById(R.id.button_stop);
 
         TextViewValueX.setText("x:"+xValue);
         TextViewValueY.setText("y:"+yValue);
         TextViewValueZ.setText("z:"+zValue);
+
         return myInflatedView;
     }
 
@@ -177,7 +289,13 @@ public class ShowSensorData extends Fragment{
          * 也会非常高，所以一定要在onPause方法中关闭触发器，否则讲耗费用户大量电量，很不负责。
          * */
         sm.unregisterListener(myAccelerometerListener);
+        sm = null;
         flagFormRun=false;
+        if (mLocationManager != null) {
+            // 移除 mLocationListener 監聽器
+            mLocationManager.removeUpdates(mLocationListener);
+            mLocationManager = null;
+        }
         super.onPause();
     }
 
