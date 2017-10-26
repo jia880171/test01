@@ -40,6 +40,18 @@ public class SignUpActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
     }
 
+    @Override
+    protected void onResume() {
+        Log.d("life cycle","onResume");
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        Log.d("life cycle","onPause");
+        super.onPause();
+    }
+
     public void createUser(View v){
         email = ((EditText)findViewById(R.id.textView_email)).getText().toString();
         password = ((EditText)findViewById(R.id.textView_password)).getText().toString();

@@ -2,26 +2,18 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <group android:checkableBehavior="single">
-        <!--<item-->
-            <!--android:id="@+id/nav_SensorLists"-->
-            <!--android:icon="@drawable/ic_menu_camera"-->
-            <!--android:title="SensorList" />-->
         <item
-            android:id="@+id/nav＿ServiceControl"
-            android:icon="@drawable/ic_menu_gallery"
+            android:id="@+id/nav_ServiceControl"
+            android:icon="@drawable/ic_menu_manage"
             android:title="設定GPS背景服務" />
-        <item
-            android:id="@+id/nav_ShowSensorData"
-            android:icon="@drawable/ic_menu_gallery"
-            android:title="show sensors's data" />
+        <!--<item-->
+            <!--android:id="@+id/nav_ShowSensorData"-->
+            <!--android:icon="@drawable/ic_menu_gallery"-->
+            <!--android:title="show sensors's data" />-->
         <item
             android:id="@+id/nav_ShowGPS"
             android:icon="@drawable/ic_menu_slideshow"
             android:title="GPS" />
-        <item
-            android:id="@+id/nav_manage"
-            android:icon="@drawable/ic_menu_manage"
-            android:title="Tools" />
     </group>
 
     <item android:title="Communicate">
@@ -30,10 +22,10 @@
                 android:id="@+id/nav_logout"
                 android:icon="@drawable/ic_menu_share"
                 android:title="Logout" />
-            <item
-                android:id="@+id/nav_send"
-                android:icon="@drawable/ic_menu_send"
-                android:title="Send" />
+            <!--<item-->
+                <!--android:id="@+id/nav_send"-->
+                <!--android:icon="@drawable/ic_menu_send"-->
+                <!--android:title="Send" />-->
         </menu>
     </item>
 

@@ -117,6 +117,10 @@ public class UploadService extends Service {
         }
     }
 
+    public int serving(){
+        return 1;
+    }
+
     @Override
     public int onStartCommand(Intent intent, final int flags, int startId) {
         Log.i("my Service Log","onStartCommand()");
