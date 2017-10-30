@@ -12,7 +12,6 @@ import java.util.Map;
  */
 
 public class AccPost {
-    public String uid;
     public JSONArray jsonArray=null;
     public String body=null;
 //    public int starCount = 0;
@@ -23,12 +22,10 @@ public class AccPost {
     }
 
     public AccPost(String uid, String body) {
-        this.uid = uid;
         this.body = body;
     }
 
     public AccPost(String uid, JSONArray jsonArray) {
-        this.uid = uid;
         this.jsonArray = jsonArray;
     }
 
@@ -36,7 +33,6 @@ public class AccPost {
     @Exclude
     public Map<String, Object> toMap() {
         HashMap<String, Object> result = new HashMap<>();
-        result.put("uid", uid);
         if(jsonArray==null){
             result.put("body", body);
         }else{

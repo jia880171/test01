@@ -1,12 +1,16 @@
 package com.example.unick.sensordemo.fragments;
 
+import android.Manifest;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
@@ -100,6 +104,14 @@ public class ServiceContralFragment extends Fragment {
         super.onResume();
         Log.d("in service control","onResume");
         final Intent intent = new Intent(getActivity(), UploadService.class);
+        //要求權限
+        int permission = ActivityCompat.checkSelfPermission(getActivity(),
+                Manifest.permission.ACCESS_FINE_LOCATION);
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            // 無權限，向使用者請求
+            Log.d("lepu in service", "ask permission");
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+        }
 
         textView_1.setVisibility(View.INVISIBLE);
         textView_2.setVisibility(View.INVISIBLE);

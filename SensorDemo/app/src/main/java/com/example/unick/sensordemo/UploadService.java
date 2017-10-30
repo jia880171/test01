@@ -243,13 +243,16 @@ public class UploadService extends Service {
     }
 
     private void writeToFirebase(String body){
-        String key = mDatabase.child("posts3/").push().getKey();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+        //String key = mDatabase.child("posts3/").push().getKey();
+        String key = mDatabase.child("data/" + sdf.format(new Date()) + "/" + FirebaseAuth.getInstance().getCurrentUser().getUid()).push().getKey();
+
         Log.d("uploadService","write acc key:"+key);
         AccPost post = new AccPost("01", body);
         //01 need to be change to UID
         Map<String, Object> postValues = post.toMap();
         Map<String, Object> childUpdates = new HashMap<>();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+
 
         childUpdates.put("data/" + sdf.format(new Date()) + "/" + FirebaseAuth.getInstance().getCurrentUser().getUid() + "/" + key,postValues);
         mDatabase.updateChildren(childUpdates);
