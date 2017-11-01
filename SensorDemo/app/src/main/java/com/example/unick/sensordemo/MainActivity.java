@@ -16,6 +16,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import com.example.unick.sensordemo.fragments.MainFragment;
 import com.example.unick.sensordemo.fragments.ServiceContralFragment;
 import com.example.unick.sensordemo.fragments.ShowGPS;
 import com.google.firebase.auth.FirebaseAuth;
@@ -38,17 +40,18 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        displaySelectedScreen(R.id.nav_ServiceControl);
+        //default display fragment
+        displaySelectedScreen(R.id.nav_MainFragment);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent();
-                intent.setClass(MainActivity.this,OpenstreetmapActivity.class);
-                startActivity(intent);
-            }
-        });
+//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+//        fab.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Intent intent = new Intent();
+//                intent.setClass(MainActivity.this,OpenstreetmapActivity.class);
+//                startActivity(intent);
+//            }
+//        });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -151,6 +154,9 @@ public class MainActivity extends AppCompatActivity
 
         //initializing the fragment object which is selected
         switch (itemId) {
+            case R.id.nav_MainFragment:
+                fragment = new MainFragment();
+                break;
             case R.id.nav_ServiceControl:
                 fragment = new ServiceContralFragment();
                 break;

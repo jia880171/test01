@@ -1,11 +1,13 @@
 package com.example.unick.sensordemo.fragments;
 
 import android.Manifest;
+import android.bluetooth.BluetoothA2dp;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -25,6 +27,10 @@ import com.example.unick.sensordemo.LoginActivity;
 import com.example.unick.sensordemo.R;
 import com.example.unick.sensordemo.UploadService;
 
+import static android.graphics.Color.BLUE;
+import static com.example.unick.sensordemo.R.color.common_google_signin_btn_text_dark_disabled;
+import static com.example.unick.sensordemo.R.color.common_google_signin_btn_text_dark_pressed;
+import static com.example.unick.sensordemo.R.id.button;
 import static com.example.unick.sensordemo.R.id.button_lift;
 import static com.example.unick.sensordemo.R.id.button_start;
 
@@ -163,6 +169,13 @@ public class ServiceContralFragment extends Fragment {
         button_drive.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                button_drive.setBackgroundColor(getResources().getColor(common_google_signin_btn_text_dark_pressed));
+                button_lift.setBackgroundColor(getResources().getColor(common_google_signin_btn_text_dark_disabled));
+                button_bus.setBackgroundColor(getResources().getColor(common_google_signin_btn_text_dark_disabled));
+                button_train.setBackgroundColor(getResources().getColor(common_google_signin_btn_text_dark_disabled));
+                button_motor.setBackgroundColor(getResources().getColor(common_google_signin_btn_text_dark_disabled));
+                button_taxi.setBackgroundColor(getResources().getColor(common_google_signin_btn_text_dark_disabled));
+                button_mrt.setBackgroundColor(getResources().getColor(common_google_signin_btn_text_dark_disabled));
                 if(mUploadService.serving()==1){
                     Log.d("inServiceControlDriving","service is working");
                 }else{
@@ -176,6 +189,13 @@ public class ServiceContralFragment extends Fragment {
         button_lift.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                button_lift.setBackgroundColor(getResources().getColor(common_google_signin_btn_text_dark_pressed));
+                button_drive.setBackgroundColor(getResources().getColor(common_google_signin_btn_text_dark_disabled));
+                button_bus.setBackgroundColor(getResources().getColor(common_google_signin_btn_text_dark_disabled));
+                button_train.setBackgroundColor(getResources().getColor(common_google_signin_btn_text_dark_disabled));
+                button_motor.setBackgroundColor(getResources().getColor(common_google_signin_btn_text_dark_disabled));
+                button_taxi.setBackgroundColor(getResources().getColor(common_google_signin_btn_text_dark_disabled));
+                button_mrt.setBackgroundColor(getResources().getColor(common_google_signin_btn_text_dark_disabled));
                 if(mBound){
                     mUploadService.setTransportType("lift");
                 }
@@ -184,6 +204,13 @@ public class ServiceContralFragment extends Fragment {
         button_motor.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                button_motor.setBackgroundColor(getResources().getColor(common_google_signin_btn_text_dark_pressed));
+                button_lift.setBackgroundColor(getResources().getColor(common_google_signin_btn_text_dark_disabled));
+                button_bus.setBackgroundColor(getResources().getColor(common_google_signin_btn_text_dark_disabled));
+                button_train.setBackgroundColor(getResources().getColor(common_google_signin_btn_text_dark_disabled));
+                button_drive.setBackgroundColor(getResources().getColor(common_google_signin_btn_text_dark_disabled));
+                button_taxi.setBackgroundColor(getResources().getColor(common_google_signin_btn_text_dark_disabled));
+                button_mrt.setBackgroundColor(getResources().getColor(common_google_signin_btn_text_dark_disabled));
                 if(mBound){
                     mUploadService.setTransportType("motor");
                 }
@@ -192,6 +219,13 @@ public class ServiceContralFragment extends Fragment {
         button_bus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                button_bus.setBackgroundColor(getResources().getColor(common_google_signin_btn_text_dark_pressed));
+                button_lift.setBackgroundColor(getResources().getColor(common_google_signin_btn_text_dark_disabled));
+                button_drive.setBackgroundColor(getResources().getColor(common_google_signin_btn_text_dark_disabled));
+                button_train.setBackgroundColor(getResources().getColor(common_google_signin_btn_text_dark_disabled));
+                button_motor.setBackgroundColor(getResources().getColor(common_google_signin_btn_text_dark_disabled));
+                button_taxi.setBackgroundColor(getResources().getColor(common_google_signin_btn_text_dark_disabled));
+                button_mrt.setBackgroundColor(getResources().getColor(common_google_signin_btn_text_dark_disabled));
                 if(mBound){
                     mUploadService.setTransportType("bus");
                 }
@@ -200,6 +234,13 @@ public class ServiceContralFragment extends Fragment {
         button_train.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                button_train.setBackgroundColor(getResources().getColor(common_google_signin_btn_text_dark_pressed));
+                button_lift.setBackgroundColor(getResources().getColor(common_google_signin_btn_text_dark_disabled));
+                button_bus.setBackgroundColor(getResources().getColor(common_google_signin_btn_text_dark_disabled));
+                button_drive.setBackgroundColor(getResources().getColor(common_google_signin_btn_text_dark_disabled));
+                button_motor.setBackgroundColor(getResources().getColor(common_google_signin_btn_text_dark_disabled));
+                button_taxi.setBackgroundColor(getResources().getColor(common_google_signin_btn_text_dark_disabled));
+                button_mrt.setBackgroundColor(getResources().getColor(common_google_signin_btn_text_dark_disabled));
                 if(mBound){
                     mUploadService.setTransportType("train");
                 }
@@ -208,6 +249,13 @@ public class ServiceContralFragment extends Fragment {
         button_taxi.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                button_taxi.setBackgroundColor(getResources().getColor(common_google_signin_btn_text_dark_pressed));
+                button_lift.setBackgroundColor(getResources().getColor(common_google_signin_btn_text_dark_disabled));
+                button_bus.setBackgroundColor(getResources().getColor(common_google_signin_btn_text_dark_disabled));
+                button_train.setBackgroundColor(getResources().getColor(common_google_signin_btn_text_dark_disabled));
+                button_motor.setBackgroundColor(getResources().getColor(common_google_signin_btn_text_dark_disabled));
+                button_drive.setBackgroundColor(getResources().getColor(common_google_signin_btn_text_dark_disabled));
+                button_mrt.setBackgroundColor(getResources().getColor(common_google_signin_btn_text_dark_disabled));
                 if(mBound){
                     mUploadService.setTransportType("taxi");
                 }
@@ -216,6 +264,13 @@ public class ServiceContralFragment extends Fragment {
         button_mrt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                button_mrt.setBackgroundColor(getResources().getColor(common_google_signin_btn_text_dark_pressed));
+                button_lift.setBackgroundColor(getResources().getColor(common_google_signin_btn_text_dark_disabled));
+                button_bus.setBackgroundColor(getResources().getColor(common_google_signin_btn_text_dark_disabled));
+                button_train.setBackgroundColor(getResources().getColor(common_google_signin_btn_text_dark_disabled));
+                button_motor.setBackgroundColor(getResources().getColor(common_google_signin_btn_text_dark_disabled));
+                button_taxi.setBackgroundColor(getResources().getColor(common_google_signin_btn_text_dark_disabled));
+                button_drive.setBackgroundColor(getResources().getColor(common_google_signin_btn_text_dark_disabled));
                 if(mBound){
                     mUploadService.setTransportType("mrt");
                 }

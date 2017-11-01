@@ -71,6 +71,9 @@
 
             <Button
                 android:id="@+id/button_drive"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:background="@color/common_google_signin_btn_text_dark_disabled"
+                android:layout_marginBottom="10dp"
                 android:layout_column="0"
                 android:layout_columnSpan="3"
                 android:layout_gravity="fill"
@@ -80,12 +83,19 @@
 
             <Button
                 android:id="@+id/button_lift"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:background="@color/common_google_signin_btn_text_dark_disabled"
+                android:layout_marginBottom="10dp"
+                android:layout_marginRight="10dp"
                 android:layout_column="0"
                 android:layout_row="3"
                 android:text="搭乘小客車" />
 
             <Button
                 android:id="@+id/button_bus"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:background="@color/common_google_signin_btn_text_dark_disabled"
+                android:layout_marginRight="10dp"
                 android:layout_width="wrap_content"
                 android:layout_column="1"
                 android:layout_row="3"
@@ -93,24 +103,32 @@
 
             <Button
                 android:id="@+id/button_train"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:background="@color/common_google_signin_btn_text_dark_disabled"
                 android:layout_column="2"
                 android:layout_row="3"
                 android:text="搭乘火車" />
 
             <Button
                 android:id="@+id/button_motor"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:background="@color/common_google_signin_btn_text_dark_disabled"
                 android:layout_column="0"
                 android:layout_row="4"
                 android:text="騎乘機車" />
 
             <Button
                 android:id="@+id/button_taxi"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:background="@color/common_google_signin_btn_text_dark_disabled"
                 android:layout_column="1"
                 android:layout_row="4"
                 android:text="搭乘計程車" />
 
             <Button
                 android:id="@+id/button_mrt"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:background="@color/common_google_signin_btn_text_dark_disabled"
                 android:layout_column="2"
                 android:layout_row="4"
                 android:text="搭乘捷運" />
