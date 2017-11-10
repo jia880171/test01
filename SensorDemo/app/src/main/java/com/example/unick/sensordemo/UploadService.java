@@ -155,9 +155,9 @@ public class UploadService extends Service {
                 while (flagFormRun){
                     try {
                         //----------------------------------------------------------------------real code
-                        if(flagForRecording ==false && speed>=15){
+                        if(flagForRecording ==false && speed>=20){
                             flagForRecording =true;
-                            Log.d("inService","speed >= 15, start recording!");
+                            Log.d("inService","speed >= 20, start recording!");
                         } else if(flagForRecording){
                             Log.d("inService","speed = " + speed);
                             Log.d("inService","recording...");
