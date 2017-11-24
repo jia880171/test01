@@ -1,16 +1,9 @@
 package com.example.unick.sensordemo;
 
-import android.content.Context;
 import android.content.Intent;
-import android.hardware.Sensor;
-import android.hardware.SensorManager;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
@@ -23,19 +16,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
 
-import com.example.unick.sensordemo.fragments.SensorLists;
+import com.example.unick.sensordemo.fragments.MainFragment;
 import com.example.unick.sensordemo.fragments.ServiceContralFragment;
 import com.example.unick.sensordemo.fragments.ShowGPS;
-import com.example.unick.sensordemo.fragments.ShowSensorData;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -52,17 +40,18 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        displaySelectedScreen(R.id.nav_ShowGPS);
+        //default display fragment
+        displaySelectedScreen(R.id.nav_MainFragment);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent();
-                intent.setClass(MainActivity.this,OpenstreetmapActivity.class);
-                startActivity(intent);
-            }
-        });
+//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+//        fab.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Intent intent = new Intent();
+//                intent.setClass(MainActivity.this,OpenstreetmapActivity.class);
+//                startActivity(intent);
+//            }
+//        });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -165,18 +154,15 @@ public class MainActivity extends AppCompatActivity
 
         //initializing the fragment object which is selected
         switch (itemId) {
-//            case R.id.nav_SensorLists:
-//                fragment = new SensorLists();
-//                break;
-            case R.id.nav＿ServiceControl:
+            case R.id.nav_MainFragment:
+                fragment = new MainFragment();
+                break;
+            case R.id.nav_ServiceControl:
                 fragment = new ServiceContralFragment();
                 break;
-            case R.id.nav_ShowSensorData:
-                fragment = new ShowSensorData();
-                break;
             case R.id.nav_ShowGPS:
-               fragment = new ShowGPS();
-               break;
+                fragment = new ShowGPS();
+                break;
         }
 
         if (fragment != null) {

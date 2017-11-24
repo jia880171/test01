@@ -1,0 +1,63 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.unick.sensordemo.fragments.MainFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+        <TextView
+            android:id="@+id/MainFragment_TextView_thx"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="首先感謝大家下載！此為實驗用測試APP所以請忽略傷眼的UI。使用說明如下：" />
+
+        <TextView
+            android:id="@+id/MainFragment_TextView_1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/MainFragment_TextView_thx"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp"
+            android:text="1.點擊左側功能欄" />
+
+        <TextView
+            android:id="@+id/MainFragment_TextView_2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/MainFragment_TextView_1"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp"
+            android:text="2.選擇 設定GPS 背景服務 （第一次使用會要求GPS權限請勾選同意）" />
+        <TextView
+            android:id="@+id/MainFragment_TextView_3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/MainFragment_TextView_2"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp"
+            android:text="3.點擊啟動 此程式就會在背景搜集GPS資料 以利我實驗" />
+        <TextView
+            android:id="@+id/MainFragment_TextView_4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/MainFragment_TextView_3"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp"
+            android:text="3.並於搭乘交通工具時點選設定 選擇搭乘之交通工具" />
+        <TextView
+            android:id="@+id/MainFragment_TextView_5"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/MainFragment_TextView_4"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp"
+            android:text="再次感謝大家的幫忙！本APP搜集之資料只用於實驗並不做於他用" />
+
+    </RelativeLayout>
+
+
+</FrameLayout>

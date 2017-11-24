@@ -20,12 +20,13 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.util.regex.Pattern;
 
 public class SignUpActivity extends AppCompatActivity {
-    private String UserName;
     private String userUID;
 
     private FirebaseAuth mAuth;
     private DatabaseReference mDatabase;
 
+    private String name;
+    private String birthday;
     private String email;
     private String password;
     private String personalID;
@@ -40,21 +41,53 @@ public class SignUpActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
     }
 
+    @Override
+    protected void onResume() {
+        Log.d("life cycle","onResume");
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        Log.d("life cycle","onPause");
+        super.onPause();
+    }
+
     public void createUser(View v){
+        name = ((EditText)findViewById(R.id.textView_name)).getText().toString();
+        birthday = ((EditText)findViewById(R.id.editText_year)).getText().toString()+"/"+((EditText)findViewById(R.id.editText_month)).getText().toString()+"/"+((EditText)findViewById(R.id.editText_day)).getText().toString();;;
         email = ((EditText)findViewById(R.id.textView_email)).getText().toString();
         password = ((EditText)findViewById(R.id.textView_password)).getText().toString();
         personalID = ((EditText)findViewById(R.id.textView_personalID)).getText().toString();
         carID = ((EditText)findViewById(R.id.carID)).getText().toString();
         phoneNumber = ((EditText)findViewById(R.id.phoneNumber)).getText().toString();
 
-
-        if(isValidTWPID(personalID)==false){
+        if(((EditText)findViewById(R.id.editText_year)).getText().toString().matches("")||((EditText)findViewById(R.id.editText_month)).getText().toString().matches("")||((EditText)findViewById(R.id.editText_day)).getText().toString().matches("")){
+            new AlertDialog.Builder(SignUpActivity.this)
+                    .setTitle("生日不可為空！")
+                    .setPositiveButton("確認", null)
+                    .show();
+            return;
+        } else if(name.matches("")){
+            new AlertDialog.Builder(SignUpActivity.this)
+                    .setTitle("姓名不可為空！")
+                    .setPositiveButton("確認", null)
+                    .show();
+            return;
+        }
+        else if(isvalidCarID(carID)==false){
+            new AlertDialog.Builder(SignUpActivity.this)
+                    .setTitle("車牌格式錯誤！！！")
+                    .setPositiveButton("確認", null)
+                    .show();
+            return;//執行權還給呼叫方不繼續往下執行
+        } else if(isValidTWPID(personalID)==false){
             new AlertDialog.Builder(SignUpActivity.this)
                     .setTitle("身分證字號格式錯誤！！！")
                     .setPositiveButton("確認", null)
                     .show();
             return;//執行權還給呼叫方不繼續往下執行
-        }else if(isValidMSISDN(phoneNumber)==false){
+        } else if(isValidMSISDN(phoneNumber)==false){
             new AlertDialog.Builder(SignUpActivity.this)
                     .setTitle("手機格式錯誤！！！")
                     .setPositiveButton("確認", null)
@@ -80,7 +113,6 @@ public class SignUpActivity extends AppCompatActivity {
                     .show();
             return;
         }
-        UserName = usernameFromEmail(email);
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(
                         new OnCompleteListener<AuthResult>() {
@@ -93,8 +125,8 @@ public class SignUpActivity extends AppCompatActivity {
                                     userUID = task.getResult().getUser().getUid();
                                     Log.d("in SignUpActivity","UserId: "+userUID);
                                     String email = task.getResult().getUser().getEmail();
-                                    String name = usernameFromEmail(email);
-                                    writeNewUser(userUID,name,email);
+                                    //String name = usernameFromEmail(email);
+                                    writeNewUser(userUID);
                                     Intent intent = new Intent();
                                     intent.setClass(SignUpActivity.this, MainActivity.class);
                                     startActivity(intent);
@@ -124,6 +156,15 @@ public class SignUpActivity extends AppCompatActivity {
         Pattern MSISDN_PATTERN = Pattern
                 .compile("[+-]?\\d{10,12}");
         if (MSISDN_PATTERN.matcher(msisdn).matches()) {
+            result = true;
+        }
+        return result;
+    }
+
+    public static boolean isvalidCarID(String carID){
+        boolean result = false;
+        Pattern CAR_PATTERN = Pattern.compile("^[A-Za-z]{1}[A-Za-z_0-9]{5}$");
+        if (CAR_PATTERN.matcher(carID).matches()){
             result = true;
         }
         return result;
@@ -171,8 +212,8 @@ public class SignUpActivity extends AppCompatActivity {
         }
     }
 
-    private void writeNewUser(String userId, String name, String email) {
-        User user = new User(name, email, carID, phoneNumber);
+    private void writeNewUser(String userId) {
+        User user = new User(name, birthday, personalID, email, carID, phoneNumber);
         mDatabase.child("users").child(userId).setValue(user);
     }
 }

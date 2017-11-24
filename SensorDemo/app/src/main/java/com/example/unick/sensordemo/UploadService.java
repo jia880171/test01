@@ -117,6 +117,10 @@ public class UploadService extends Service {
         }
     }
 
+    public int serving(){
+        return 1;
+    }
+
     @Override
     public int onStartCommand(Intent intent, final int flags, int startId) {
         Log.i("my Service Log","onStartCommand()");
@@ -151,9 +155,9 @@ public class UploadService extends Service {
                 while (flagFormRun){
                     try {
                         //----------------------------------------------------------------------real code
-                        if(flagForRecording ==false && speed>=15){
+                        if(flagForRecording ==false && speed>=20){
                             flagForRecording =true;
-                            Log.d("inService","speed >= 15, start recording!");
+                            Log.d("inService","speed >= 20, start recording!");
                         } else if(flagForRecording){
                             Log.d("inService","speed = " + speed);
                             Log.d("inService","recording...");
@@ -239,13 +243,16 @@ public class UploadService extends Service {
     }
 
     private void writeToFirebase(String body){
-        String key = mDatabase.child("posts3/").push().getKey();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+        //String key = mDatabase.child("posts3/").push().getKey();
+        String key = mDatabase.child("data/" + sdf.format(new Date()) + "/" + FirebaseAuth.getInstance().getCurrentUser().getUid()).push().getKey();
+
         Log.d("uploadService","write acc key:"+key);
         AccPost post = new AccPost("01", body);
         //01 need to be change to UID
         Map<String, Object> postValues = post.toMap();
         Map<String, Object> childUpdates = new HashMap<>();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+
 
         childUpdates.put("data/" + sdf.format(new Date()) + "/" + FirebaseAuth.getInstance().getCurrentUser().getUid() + "/" + key,postValues);
         mDatabase.updateChildren(childUpdates);
