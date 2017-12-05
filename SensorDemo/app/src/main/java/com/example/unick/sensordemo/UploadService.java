@@ -1,5 +1,7 @@
 package com.example.unick.sensordemo;
 
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -81,6 +83,8 @@ public class UploadService extends Service {
     JSONArray JArray;
 
 
+
+
     public class LocalBinder extends Binder {
         public UploadService getService() {
             // Return this instance of LocalService so clients can call public methods
@@ -125,7 +129,9 @@ public class UploadService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, final int flags, int startId) {
-        Log.i("my Service Log","onStartCommand()");
+
+        Notification notification = new Notification(R.drawable.cast_ic_notification_small_icon, getText(R.string.ForegroundService_notification), System.currentTimeMillis());
+        startForeground(666, notification);
 
         //set fireBase
         mDatabase = FirebaseDatabase.getInstance().getReference();

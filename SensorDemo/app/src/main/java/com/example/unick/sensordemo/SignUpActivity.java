@@ -74,13 +74,6 @@ public class SignUpActivity extends AppCompatActivity {
                     .setPositiveButton("確認", null)
                     .show();
             return;
-        }
-        else if(isvalidCarID(carID)==false){
-            new AlertDialog.Builder(SignUpActivity.this)
-                    .setTitle("車牌格式錯誤！！！")
-                    .setPositiveButton("確認", null)
-                    .show();
-            return;//執行權還給呼叫方不繼續往下執行
         } else if(isValidTWPID(personalID)==false){
             new AlertDialog.Builder(SignUpActivity.this)
                     .setTitle("身分證字號格式錯誤！！！")

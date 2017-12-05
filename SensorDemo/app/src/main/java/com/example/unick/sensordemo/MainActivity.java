@@ -160,9 +160,9 @@ public class MainActivity extends AppCompatActivity
             case R.id.nav_ServiceControl:
                 fragment = new ServiceContralFragment();
                 break;
-            case R.id.nav_ShowGPS:
-                fragment = new ShowGPS();
-                break;
+//            case R.id.nav_ShowGPS:
+//                fragment = new ShowGPS();
+//                break;
         }
 
         if (fragment != null) {
