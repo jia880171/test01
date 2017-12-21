@@ -1,10 +1,13 @@
 package com.example.unick.sensordemo;
 
 import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -18,7 +21,9 @@ import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.support.v7.app.NotificationCompat;
 import android.util.Log;
+import android.widget.CheckBox;
 
 import com.example.unick.sensordemo.models.AccPost;
 import com.google.android.gms.maps.model.LatLng;
@@ -82,9 +87,6 @@ public class UploadService extends Service {
     //生成一個JsonArray
     JSONArray JArray;
 
-
-
-
     public class LocalBinder extends Binder {
         public UploadService getService() {
             // Return this instance of LocalService so clients can call public methods
@@ -130,8 +132,24 @@ public class UploadService extends Service {
     @Override
     public int onStartCommand(Intent intent, final int flags, int startId) {
 
-        Notification notification = new Notification(R.drawable.cast_ic_notification_small_icon, getText(R.string.ForegroundService_notification), System.currentTimeMillis());
-        startForeground(666, notification);
+//        Notification notification = new Notification(R.drawable.cast_ic_notification_small_icon, getText(R.string.ForegroundService_notification), System.currentTimeMillis());
+//        startForeground(666, notification);
+
+        Notification.Builder builder = new Notification.Builder (this.getApplicationContext()); //获取一个Notification构造器
+        Intent nfIntent = new Intent(this, MainActivity.class);
+
+        builder.setContentIntent(PendingIntent.getActivity(this, 0, nfIntent, 0))
+                .setLargeIcon(BitmapFactory.decodeResource(this.getResources(), R.drawable.cast_ic_notification_small_icon))
+                .setContentTitle("UBI APP")
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentText("APP 執行中")
+                .setWhen(System.currentTimeMillis());
+
+        Notification notification = builder.build();
+        notification.defaults = Notification.DEFAULT_SOUND;
+
+        startForeground(110, notification);
+
 
         //set fireBase
         mDatabase = FirebaseDatabase.getInstance().getReference();
