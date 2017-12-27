@@ -14,6 +14,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -74,13 +75,6 @@ public class SignUpActivity extends AppCompatActivity {
                     .setPositiveButton("確認", null)
                     .show();
             return;
-        }
-        else if(isvalidCarID(carID)==false){
-            new AlertDialog.Builder(SignUpActivity.this)
-                    .setTitle("車牌格式錯誤！！！")
-                    .setPositiveButton("確認", null)
-                    .show();
-            return;//執行權還給呼叫方不繼續往下執行
         } else if(isValidTWPID(personalID)==false){
             new AlertDialog.Builder(SignUpActivity.this)
                     .setTitle("身分證字號格式錯誤！！！")
@@ -131,8 +125,14 @@ public class SignUpActivity extends AppCompatActivity {
                                     intent.setClass(SignUpActivity.this, MainActivity.class);
                                     startActivity(intent);
                                 }else{
+                                    String userCreateFailedMessage=" ";
+                                    if (task.getException() instanceof FirebaseAuthUserCollisionException) {
+                                        userCreateFailedMessage="該信箱已被使用";
+                                    }
+                                    Log.d("failed to create:", "reason: "+task.getException() );
                                     new AlertDialog.Builder(SignUpActivity.this)
                                             .setTitle(message)
+                                            .setMessage(userCreateFailedMessage)
                                             .setPositiveButton("確認", null)
                                             .show();
                                     return;//執行權還給呼叫方不繼續往下執行

@@ -14,10 +14,10 @@
             <!--android:id="@+id/nav_ShowSensorData"-->
             <!--android:icon="@drawable/ic_menu_gallery"-->
             <!--android:title="show sensors's data" />-->
-        <item
-            android:id="@+id/nav_ShowGPS"
-            android:icon="@drawable/ic_menu_slideshow"
-            android:title="GPS" />
+        <!--<item-->
+            <!--android:id="@+id/nav_ShowGPS"-->
+            <!--android:icon="@drawable/ic_menu_slideshow"-->
+            <!--android:title="GPS" />-->
     </group>
 
     <item android:title="Communicate">
