@@ -32,6 +32,7 @@ public class SignUpActivity extends AppCompatActivity {
     private String password;
     private String personalID;
     private String carID;
+    private String carID_2;
     private String phoneNumber;
 
     @Override
@@ -61,6 +62,7 @@ public class SignUpActivity extends AppCompatActivity {
         password = ((EditText)findViewById(R.id.textView_password)).getText().toString();
         personalID = ((EditText)findViewById(R.id.textView_personalID)).getText().toString();
         carID = ((EditText)findViewById(R.id.carID)).getText().toString();
+        carID_2 = ((EditText)findViewById(R.id.carID_2)).getText().toString();
         phoneNumber = ((EditText)findViewById(R.id.phoneNumber)).getText().toString();
 
         if(((EditText)findViewById(R.id.editText_year)).getText().toString().matches("")||((EditText)findViewById(R.id.editText_month)).getText().toString().matches("")||((EditText)findViewById(R.id.editText_day)).getText().toString().matches("")){
@@ -213,7 +215,7 @@ public class SignUpActivity extends AppCompatActivity {
     }
 
     private void writeNewUser(String userId) {
-        User user = new User(name, birthday, personalID, email, carID, phoneNumber);
+        User user = new User(name, birthday, personalID, email, carID, carID_2, phoneNumber);
         mDatabase.child("users").child(userId).setValue(user);
     }
 }

@@ -152,6 +152,20 @@
 
         </android.support.design.widget.TextInputLayout>
 
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <EditText
+                android:id="@+id/carID_2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="(選填)第二組車牌號碼"
+                android:maxLines="1"
+                android:singleLine="true" />
+
+        </android.support.design.widget.TextInputLayout>
+
         <Button
             android:id="@+id/sign_up_button"
             style="?android:textAppearanceSmall"

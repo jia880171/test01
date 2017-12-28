@@ -11,132 +11,33 @@
 
         <TextView
             android:id="@+id/textView3"
+            android:text="請點擊啟動來開始UBI服務"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_marginTop="15dp"
-            android:text="點擊以啟動或設定背景服務" />
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="30dp"
+            android:layout_marginBottom="30dp"
+             />
 
         <Button
             android:id="@+id/button_start"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="13dp"
             android:text="啟動"
-            android:layout_below="@+id/textView3"
-            android:layout_alignStart="@+id/gridLayout" />
-
-        <Button
-            android:id="@+id/button_setting"
-            android:layout_width="wrap_content"
+            android:layout_width="200dp"
             android:layout_height="wrap_content"
-            android:layout_alignTop="@+id/button_start"
             android:layout_centerHorizontal="true"
-            android:text="設定" />
+            android:layout_below="@+id/textView3"
+            android:layout_marginTop="30dp"
+            />
 
         <Button
             android:id="@+id/button_stop"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:text="結束"
-            android:layout_alignBaseline="@+id/button_setting"
-            android:layout_alignBottom="@+id/button_setting"
-            android:layout_alignEnd="@+id/gridLayout" />
-
-        <TextView
-            android:id="@+id/textView1"
-            android:layout_width="wrap_content"
+            android:layout_width="200dp"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/button_stop"
-            android:layout_marginLeft="10dp"
-            android:layout_marginTop="20dp"
-            android:text="注意！此為實驗版APP。" />
-
-        <TextView
-            android:id="@+id/textView2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/textView1"
-            android:layout_marginLeft="10dp"
-            android:text="為了方便標記資料，請選擇搭乘的交通工具！" />
-
-        <GridLayout
-            android:id="@+id/gridLayout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/textView2"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="10dp"
-            android:rowCount="6">
-
-            <Button
-                android:id="@+id/button_drive"
-                style="@style/Widget.AppCompat.Button.Borderless"
-                android:background="@color/common_google_signin_btn_text_dark_disabled"
-                android:layout_marginBottom="10dp"
-                android:layout_column="0"
-                android:layout_columnSpan="3"
-                android:layout_gravity="fill"
-                android:layout_row="0"
-                android:layout_rowSpan="2"
-                android:text="自行開車" />
-
-            <Button
-                android:id="@+id/button_lift"
-                style="@style/Widget.AppCompat.Button.Borderless"
-                android:background="@color/common_google_signin_btn_text_dark_disabled"
-                android:layout_marginBottom="10dp"
-                android:layout_marginRight="10dp"
-                android:layout_column="0"
-                android:layout_row="3"
-                android:text="搭乘小客車" />
-
-            <Button
-                android:id="@+id/button_bus"
-                style="@style/Widget.AppCompat.Button.Borderless"
-                android:background="@color/common_google_signin_btn_text_dark_disabled"
-                android:layout_marginRight="10dp"
-                android:layout_width="wrap_content"
-                android:layout_column="1"
-                android:layout_row="3"
-                android:text="搭乘公車" />
-
-            <Button
-                android:id="@+id/button_train"
-                style="@style/Widget.AppCompat.Button.Borderless"
-                android:background="@color/common_google_signin_btn_text_dark_disabled"
-                android:layout_column="2"
-                android:layout_row="3"
-                android:text="搭乘火車" />
-
-            <Button
-                android:id="@+id/button_motor"
-                style="@style/Widget.AppCompat.Button.Borderless"
-                android:background="@color/common_google_signin_btn_text_dark_disabled"
-                android:layout_column="0"
-                android:layout_row="4"
-                android:text="騎乘機車" />
-
-            <Button
-                android:id="@+id/button_taxi"
-                style="@style/Widget.AppCompat.Button.Borderless"
-                android:background="@color/common_google_signin_btn_text_dark_disabled"
-                android:layout_column="1"
-                android:layout_row="4"
-                android:text="搭乘計程車" />
-
-            <Button
-                android:id="@+id/button_mrt"
-                style="@style/Widget.AppCompat.Button.Borderless"
-                android:background="@color/common_google_signin_btn_text_dark_disabled"
-                android:layout_column="2"
-                android:layout_row="4"
-                android:text="搭乘捷運" />
-
-        </GridLayout>
-
-
-
+            android:layout_below="@+id/button_start"
+            android:layout_marginTop="30dp"
+            />
 
     </RelativeLayout>
 
