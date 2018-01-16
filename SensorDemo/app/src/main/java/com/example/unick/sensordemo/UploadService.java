@@ -68,8 +68,9 @@ public class UploadService extends Service {
     // 定位監聽器
     private LocationListener mLocationListener;
     private LatLng latLng;
-    //private String add;
     private Date time;
+    private Notification.Builder myNotificationBuilder;
+    private Notification notification;
 
     private long timeInMilli;
 
@@ -135,19 +136,18 @@ public class UploadService extends Service {
 //        Notification notification = new Notification(R.drawable.cast_ic_notification_small_icon, getText(R.string.ForegroundService_notification), System.currentTimeMillis());
 //        startForeground(666, notification);
 
-        Notification.Builder builder = new Notification.Builder (this.getApplicationContext()); //获取一个Notification构造器
+        myNotificationBuilder = new Notification.Builder (this.getApplicationContext()); //获取一个Notification构造器
         Intent nfIntent = new Intent(this, MainActivity.class);
 
-        builder.setContentIntent(PendingIntent.getActivity(this, 0, nfIntent, 0))
+        myNotificationBuilder.setContentIntent(PendingIntent.getActivity(this, 0, nfIntent, 0))
                 .setLargeIcon(BitmapFactory.decodeResource(this.getResources(), R.drawable.cast_ic_notification_small_icon))
                 .setContentTitle("UBI APP")
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentText("APP 執行中")
                 .setWhen(System.currentTimeMillis());
 
-        Notification notification = builder.build();
+        notification = myNotificationBuilder.build();
         notification.defaults = Notification.DEFAULT_SOUND;
-
         startForeground(110, notification);
 
 
@@ -211,7 +211,7 @@ public class UploadService extends Service {
                         } else {
                             Log.d("checking","60 per/min");
                             stringBuilder_acc = new StringBuilder();
-                            Thread.sleep(60000);//checking rate : 1 per/min
+                            //Thread.sleep(60000);//checking rate : 1 per/min
                         }
                         //----------------------------------------------------------------------real code
 
@@ -382,6 +382,7 @@ public class UploadService extends Service {
 
     @Override
     public void onDestroy() {
+        Log.d("in service","call onDestroy");
         if (mLocationManager != null) {
             // 移除 mLocationListener 監聽器
             mLocationManager.removeUpdates(mLocationListener);
@@ -391,7 +392,6 @@ public class UploadService extends Service {
             sensor_manager.unregisterListener(listener);
             flagFormRun = false;
         }
-
         super.onDestroy();
     }
 }

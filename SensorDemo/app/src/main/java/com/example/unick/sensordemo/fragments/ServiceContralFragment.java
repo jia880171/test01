@@ -56,7 +56,7 @@ public class ServiceContralFragment extends Fragment {
 
     //bind to uploadService
     UploadService mUploadService;
-    boolean mBound = false;
+    boolean mBound=false;
 
     private Button button_stop;
     private Button button_start;
@@ -100,8 +100,9 @@ public class ServiceContralFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        Log.d("in service control","onResume");
         final Intent intent = new Intent(getActivity(), UploadService.class);
+        getActivity().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        Log.d("in service control","onResume,mBound: "+mBound );
         //要求權限
         int permission = ActivityCompat.checkSelfPermission(getActivity(),
                 Manifest.permission.ACCESS_FINE_LOCATION);
@@ -121,10 +122,11 @@ public class ServiceContralFragment extends Fragment {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 getActivity().startService(intent);
-                                getActivity().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+
                                 Intent intent = new Intent();
                                 intent.setClass(getActivity(), MainActivity.class);
                                 startActivity(intent);
+                                Log.d("in service Control","startService,mBound:" +mBound);
                             }
                         })
                         .show();
@@ -138,22 +140,29 @@ public class ServiceContralFragment extends Fragment {
                         .setTitle("已關閉背景GPS服務")
                         .setPositiveButton("確認", null)
                         .show();
-                if (mBound) {
-                    getActivity().unbindService(mConnection);
-                    mBound = false;
-                }
-                getActivity().stopService(intent);
+                unBind();
             }
         });
     }
 
-    private void afterStart(){
-
+    public void unBind(){
+        Log.d("in service Control","button stop,mBound"+mBound);
+        if (mBound==true) {
+            Log.d("in service Control","mBound==true");
+            getActivity().unbindService(mConnection);
+            mBound = false;
+            Log.d("in service Control","mBound==false");
+        }else if(mBound==false){
+            Log.d("in service Control","mBound==false: "+mBound);
+        }
+        getActivity().stopService(intent);
+        Log.d("in service Control","stopService,mBound:"+mBound);
     }
 
     @Override
     public void onPause() {
         super.onPause();
+        Log.d("in service control","onPause,mBound: "+mBound);
         if (mBound) {
             getActivity().unbindService(mConnection);
             mBound = false;
@@ -175,6 +184,7 @@ public class ServiceContralFragment extends Fragment {
 
         @Override
         public void onServiceDisconnected(ComponentName arg0) {
+            Log.d("in service control","onServiceDisconnected");
             mBound = false;
         }
     };

@@ -1,7 +1,11 @@
 package com.example.unick.sensordemo;
 
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -32,6 +36,10 @@ public class MainActivity extends AppCompatActivity
     private String userUID;
     private DatabaseReference mDatabase;
     private int req = 1;
+
+    //bind to uploadService
+    UploadService mUploadService;
+    boolean mBound=false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +84,7 @@ public class MainActivity extends AppCompatActivity
         super.onActivityResult(requestCode, resultCode, data);
         String username = data.getStringExtra("username");
     }
+
 
     @Override
     protected void onStart() {
@@ -122,6 +131,7 @@ public class MainActivity extends AppCompatActivity
         switch (item.getItemId()) {
             case R.id.nav_logout:
                 mAuth.signOut();
+                unbind();
                 DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
                 drawer.closeDrawer(GravityCompat.START);
                 break;
@@ -130,6 +140,33 @@ public class MainActivity extends AppCompatActivity
         }
         return true;
     }
+
+    private void unbind(){
+        Intent intent = new Intent(MainActivity.this, UploadService.class);
+        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        unbindService(mConnection);
+        stopService(intent);
+    }
+
+    /** Defines callbacks for service binding, passed to bindService() */
+    private ServiceConnection mConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            UploadService.LocalBinder binder = (UploadService.LocalBinder) service;
+            mUploadService = binder.getService();
+            mBound = true;
+            Log.d("in service control","set mBound: "+mBound);
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            Log.d("in service control","onServiceDisconnected");
+            mBound = false;
+        }
+    };
 
     private void displaySelectedScreen(int itemId) {
 
@@ -158,4 +195,5 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
     }
+
 }
