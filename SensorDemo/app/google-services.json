@@ -10,7 +10,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:708996818437:android:55a1c364826272e6",
         "android_client_info": {
-          "package_name": "com.example.unick.sensordemo"
+          "package_name": "com.my.unick.sensordemo"
         }
       },
       "oauth_client": [

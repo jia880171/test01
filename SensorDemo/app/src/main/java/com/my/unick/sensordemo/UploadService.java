@@ -1,18 +1,15 @@
-package com.example.unick.sensordemo;
+package com.my.unick.sensordemo;
 
 import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.icu.util.Calendar;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -21,13 +18,10 @@ import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
-import android.support.v7.app.NotificationCompat;
 import android.util.Log;
-import android.widget.CheckBox;
 
-import com.example.unick.sensordemo.models.AccPost;
+import com.my.unick.sensordemo.models.AccPost;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.vision.barcode.Barcode;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -211,7 +205,7 @@ public class UploadService extends Service {
                         } else {
                             Log.d("checking","60 per/min");
                             stringBuilder_acc = new StringBuilder();
-                            //Thread.sleep(60000);//checking rate : 1 per/min
+                            Thread.sleep(60000);//checking rate : 1 per/min
                         }
                         //----------------------------------------------------------------------real code
 

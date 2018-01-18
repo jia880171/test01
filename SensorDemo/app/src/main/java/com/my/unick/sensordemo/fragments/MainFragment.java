@@ -1,14 +1,12 @@
-package com.example.unick.sensordemo.fragments;
+package com.my.unick.sensordemo.fragments;
 
-import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.unick.sensordemo.R;
+import com.my.unick.sensordemo.R;
 
 /**
  * A simple {@link Fragment} subclass.

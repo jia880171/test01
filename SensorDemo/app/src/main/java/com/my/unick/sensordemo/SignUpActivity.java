@@ -1,4 +1,4 @@
-package com.example.unick.sensordemo;
+package com.my.unick.sensordemo;
 
 import android.content.Intent;
 import android.support.annotation.NonNull;
@@ -9,7 +9,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 
-import com.example.unick.sensordemo.models.User;
+import com.my.unick.sensordemo.models.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;

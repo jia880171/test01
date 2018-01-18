@@ -1,4 +1,4 @@
-package com.example.unick.sensordemo.models;
+package com.my.unick.sensordemo.models;
 
 /**
  * Created by unick on 2017/8/17.

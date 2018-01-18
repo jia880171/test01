@@ -1,16 +1,12 @@
-package com.example.unick.sensordemo.fragments;
+package com.my.unick.sensordemo.fragments;
 
 import android.Manifest;
-import android.bluetooth.BluetoothA2dp;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
-import android.location.LocationManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.ActivityCompat;
@@ -21,20 +17,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.NumberPicker;
-import android.widget.TextView;
 
-import com.example.unick.sensordemo.LoginActivity;
-import com.example.unick.sensordemo.MainActivity;
-import com.example.unick.sensordemo.R;
-import com.example.unick.sensordemo.SignUpActivity;
-import com.example.unick.sensordemo.UploadService;
-
-import static android.graphics.Color.BLUE;
-import static com.example.unick.sensordemo.R.color.common_google_signin_btn_text_dark_disabled;
-import static com.example.unick.sensordemo.R.color.common_google_signin_btn_text_dark_pressed;
-import static com.example.unick.sensordemo.R.id.button;
-import static com.example.unick.sensordemo.R.id.button_start;
+import com.my.unick.sensordemo.MainActivity;
+import com.my.unick.sensordemo.R;
+import com.my.unick.sensordemo.UploadService;
 
 /**
  * A simple {@link Fragment} subclass.

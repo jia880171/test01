@@ -1,4 +1,4 @@
-package com.example.unick.sensordemo;
+package com.my.unick.sensordemo;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

@@ -1,4 +1,4 @@
-package com.example.unick.sensordemo;
+package com.my.unick.sensordemo;
 
 import org.junit.Test;
 

@@ -1,4 +1,4 @@
-package com.example.unick.sensordemo.models;
+package com.my.unick.sensordemo.models;
 
 import com.google.firebase.database.Exclude;
 

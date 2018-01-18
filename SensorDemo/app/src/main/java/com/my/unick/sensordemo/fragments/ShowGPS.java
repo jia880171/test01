@@ -1,7 +1,6 @@
-package com.example.unick.sensordemo.fragments;
+package com.my.unick.sensordemo.fragments;
 
 import android.Manifest;
-import static android.Manifest.permission.*;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -13,7 +12,6 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -25,7 +23,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.unick.sensordemo.R;
+import com.my.unick.sensordemo.R;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.Date;

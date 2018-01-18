@@ -1,8 +1,8 @@
-package com.example.unick.sensordemo;
+package com.my.unick.sensordemo;
 
-import android.content.DialogInterface;
+import android.app.Application;
 import android.content.Intent;
-import android.content.ServiceConnection;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -11,7 +11,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 
-import com.example.unick.sensordemo.models.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -98,6 +97,15 @@ public class LoginActivity extends AppCompatActivity {
 //
 //        mDatabase.child("users").child(userId).setValue(user);
 //    }
+
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        moveTaskToBack(true);
+        android.os.Process.killProcess(android.os.Process.myPid());
+        System.exit(0);
+    }
 
     public void logIn(final View v){
         String email = ((EditText)findViewById(R.id.email)).getText().toString();

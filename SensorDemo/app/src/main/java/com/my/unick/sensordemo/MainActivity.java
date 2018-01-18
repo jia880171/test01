@@ -1,4 +1,4 @@
-package com.example.unick.sensordemo;
+package com.my.unick.sensordemo;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -7,11 +7,9 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -21,9 +19,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.example.unick.sensordemo.fragments.MainFragment;
-import com.example.unick.sensordemo.fragments.ServiceContralFragment;
-import com.example.unick.sensordemo.fragments.ShowGPS;
+import com.my.unick.sensordemo.fragments.MainFragment;
+import com.my.unick.sensordemo.fragments.ServiceContralFragment;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -72,18 +69,22 @@ public class MainActivity extends AppCompatActivity
                 } else {
                     // User is signed out
                     Log.d("mainActivity", "onAuthStateChanged:signed_out");
-                    startActivityForResult(new Intent(MainActivity.this, LoginActivity.class), req);
+                    Intent intent = new Intent();
+                    intent.setClass(MainActivity.this, LoginActivity.class);
+                    intent.addCategory(Intent.CATEGORY_HOME);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivityForResult(intent, req);
                 }
             }
         };
     }
 
-    //call back function
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        String username = data.getStringExtra("username");
-    }
+//    //call back function
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//        String username = data.getStringExtra("username");
+//    }
 
 
     @Override
