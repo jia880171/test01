@@ -1,0 +1,22 @@
+01/19/18 17:44:38:176 | [INFO] |  |  |  |  |  |  | 5572388 | *******************start of Download****************
+01/19/18 17:44:38:176 | [INFO] |  |  |  |  |  |  | 5572388 | GDE Version is 9.0.0.4 (BuildVersion: 6.0; BuildDate: Wed Mar 04 2015 21:34:10 )
+01/19/18 17:44:38:177 | [INFO] |  |  |  |  |  |  | 5572388 | The file to be downloaded is http://agsupdate.adobe.com/osx/AGC_4_4_0_652_osx10_cef.zip
+01/19/18 17:44:38:177 | [INFO] |  |  |  |  |  |  | 5572388 | Going to download the file at /System/Library/Frameworks/Carbon.framework/Versions/A/Adobe/AdobeGCClient/AdobeGCClient.zip
+01/19/18 17:44:38:177 | [INFO] |  |  |  |  |  |  | 5572388 | Preference: Client has set the preference for single stream download
+01/19/18 17:44:38:177 | [ERROR] |  |  |  |  |  |  | 5572388 | Unable to create directory /System/Library/Frameworks/Carbon.framework/Versions/A/Adobe/AdobeGCClient/. Error is 513 and error domain is NSCocoaErrorDomain. You don’t have permission to save the file “AdobeGCClient” in the folder “Adobe”.
+01/19/18 17:44:38:177 | [ERROR] |  |  |  |  |  |  | 5572388 | failed to create a dir - /System/Library/Frameworks/Carbon.framework/Versions/A/Adobe/AdobeGCClient/ on local disk.
+01/19/18 17:44:38:177 | [ERROR] |  |  |  |  |  |  | 5572388 | failed to init the global file data for downloading
+01/19/18 17:44:38:177 | [INFO] |  |  |  |  |  |  | 5572388 | *******************End****************
+
+
+01/19/18 23:44:46:313 | [INFO] |  |  |  |  |  |  | 5887841 | *******************start of Download****************
+01/19/18 23:44:46:315 | [INFO] |  |  |  |  |  |  | 5887841 | GDE Version is 9.0.0.4 (BuildVersion: 6.0; BuildDate: Wed Mar 04 2015 21:34:10 )
+01/19/18 23:44:46:317 | [INFO] |  |  |  |  |  |  | 5887841 | The file to be downloaded is http://agsupdate.adobe.com/osx/AGC_4_4_0_652_osx10_cef.zip
+01/19/18 23:44:46:317 | [INFO] |  |  |  |  |  |  | 5887841 | Going to download the file at /System/Library/Frameworks/Carbon.framework/Versions/A/Adobe/AdobeGCClient/AdobeGCClient.zip
+01/19/18 23:44:46:317 | [INFO] |  |  |  |  |  |  | 5887841 | Preference: Client has set the preference for single stream download
+01/19/18 23:44:46:318 | [ERROR] |  |  |  |  |  |  | 5887841 | Unable to create directory /System/Library/Frameworks/Carbon.framework/Versions/A/Adobe/AdobeGCClient/. Error is 513 and error domain is NSCocoaErrorDomain. You don’t have permission to save the file “AdobeGCClient” in the folder “Adobe”.
+01/19/18 23:44:46:318 | [ERROR] |  |  |  |  |  |  | 5887841 | failed to create a dir - /System/Library/Frameworks/Carbon.framework/Versions/A/Adobe/AdobeGCClient/ on local disk.
+01/19/18 23:44:46:318 | [ERROR] |  |  |  |  |  |  | 5887841 | failed to init the global file data for downloading
+01/19/18 23:44:46:318 | [INFO] |  |  |  |  |  |  | 5887841 | *******************End****************
+
+
