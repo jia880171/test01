@@ -48,6 +48,12 @@ public class UploadService extends Service {
 
     private DatabaseReference mDatabase;
 
+    private static final int speed_walking_start = 5;
+    private static final int speed_walking_stop = 1;
+
+    private static final int speed_driving_start = 20;
+    private static final int speed_driving_stop = 2;
+
     private StringBuilder stringBuilder_acc;
     private String acc_record;
 
@@ -175,7 +181,7 @@ public class UploadService extends Service {
                 while (flagFormRun){
                     try {
                         //----------------------------------------------------------------------real code
-                        if(flagForRecording ==false && speed>=20){
+                        if(flagForRecording ==false && speed>=speed_driving_start){
                             flagForRecording =true;
                             Log.d("inService","speed >= 20, start recording!");
                         } else if(flagForRecording){
@@ -183,10 +189,10 @@ public class UploadService extends Service {
                             Log.d("inService","recording...");
                             timeInMilli = System.currentTimeMillis();
                             AppendJsonObject();
-                            if(speed>5){
+                            if(speed>speed_driving_stop){
                                 Log.d("inService","speed >5, set mCount to 0");
                                 mCount=0;
-                            } else if(speed<5){
+                            } else if(speed<speed_driving_stop){
                                 mCount = mCount +1;
                                 Log.d("inService","speed <5, mCount ++");
                                 Log.d("inService","mCount: " + mCount);
