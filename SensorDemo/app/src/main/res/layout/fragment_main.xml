@@ -9,10 +9,23 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         >
+
+        <TextView
+            android:id="@+id/MainFragment_TextView_battery_State"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="" />
+        <TextView
+            android:id="@+id/MainFragment_TextView_UID"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/MainFragment_TextView_battery_State"
+            android:text="" />
         <TextView
             android:id="@+id/MainFragment_TextView_thx"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/MainFragment_TextView_UID"
             android:text="使用步驟如下：" />
 
         <TextView

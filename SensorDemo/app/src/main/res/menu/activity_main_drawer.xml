@@ -10,6 +10,10 @@
             android:id="@+id/nav_ServiceControl"
             android:icon="@drawable/ic_menu_manage"
             android:title="設定UBI服務" />
+        <item
+            android:id="@+id/nav_ReadTest"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="read" />
     </group>
 
     <item android:title="Communicate">

@@ -182,6 +182,11 @@ public class MainActivity extends AppCompatActivity
             case R.id.nav_ServiceControl:
                 fragment = new ServiceContralFragment();
                 break;
+            case R.id.nav_ReadTest:
+                Intent readIntent = new Intent();
+                readIntent.setClass(MainActivity.this,localDataActivity.class);
+                startActivity(readIntent);
+                break;
 //            case R.id.nav_ShowGPS:
 //                fragment = new ShowGPS();
 //                break;

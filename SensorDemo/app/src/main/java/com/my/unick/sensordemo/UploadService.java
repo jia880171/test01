@@ -19,6 +19,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.my.unick.sensordemo.models.AccPost;
 import com.google.android.gms.maps.model.LatLng;
@@ -30,6 +31,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -133,8 +139,7 @@ public class UploadService extends Service {
     @Override
     public int onStartCommand(Intent intent, final int flags, int startId) {
 
-//        Notification notification = new Notification(R.drawable.cast_ic_notification_small_icon, getText(R.string.ForegroundService_notification), System.currentTimeMillis());
-//        startForeground(666, notification);
+        Log.d("Unick uploadService","onStartCommand");
 
         myNotificationBuilder = new Notification.Builder (this.getApplicationContext()); //获取一个Notification构造器
         Intent nfIntent = new Intent(this, MainActivity.class);
@@ -203,6 +208,7 @@ public class UploadService extends Service {
                                     Log.d("inService","speed: " + speed);
                                     Log.d("inService","start uploading!");
                                     //acc_record = stringBuilder_acc.toString();
+                                    createFile("textFile.txt",JArray.toString());
                                     writeToFirebase(JArray.toString());//upload to fireBase
                                     JArray = new JSONArray();
                                 }
@@ -394,4 +400,43 @@ public class UploadService extends Service {
         }
         super.onDestroy();
     }
+
+    // 建立私有文擋
+    private void createFile(String fName,String body) {
+        try {
+            // 建立應用程式私有文件
+            FileOutputStream fOut = openFileOutput(fName, MODE_APPEND);
+            OutputStreamWriter osw = new OutputStreamWriter(fOut);
+            // 寫入資料
+            Log.d("upload","create file");
+            osw.write(body);
+            osw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // 讀取文擋資料
+    private void readFile(File file) {
+        char[] buffer = new char[1];
+        FileReader fr = null;
+        StringBuilder sb = new StringBuilder();
+        try {
+            fr = new FileReader(file);
+            while (fr.read(buffer)!= -1) {
+                sb.append(new String(buffer));
+            }
+//            textView1.setText(file.getAbsolutePath() + "\n\n" +
+//                    sb.toString());
+        }
+        catch (IOException e) { }
+        finally {
+            try {
+                fr.close(); // 關閉檔案
+            }
+            catch (IOException e) { }
+        }
+    }
+
+
 }

@@ -1,11 +1,23 @@
 package com.my.unick.sensordemo.fragments;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.BatteryManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.TextView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.my.unick.sensordemo.LoginActivity;
+import com.my.unick.sensordemo.MainActivity;
 import com.my.unick.sensordemo.R;
 
 /**
@@ -25,6 +37,13 @@ public class MainFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+    private FirebaseAuth mAuth;
+    private FirebaseAuth.AuthStateListener mAuthListener;
+    private Context context;
+    private int battery_status;
+    private boolean isCharging;
+    TextView textView_Battery_State;
+    TextView textView_UID ;
 
     //private OnFragmentInteractionListener mListener;
 
@@ -52,18 +71,60 @@ public class MainFragment extends Fragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        Log.d("MainFragment","???");
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        context = getActivity();
+        IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+        Intent batteryStatus = context.registerReceiver(null, ifilter);
+        battery_status = batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
+        isCharging = battery_status == BatteryManager.BATTERY_STATUS_CHARGING ||
+                battery_status == BatteryManager.BATTERY_STATUS_FULL;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_main, container, false);
+        final View myInflatedView = inflater.inflate(R.layout.fragment_main, container,false);
+        textView_Battery_State = (TextView) myInflatedView.findViewById(R.id.MainFragment_TextView_battery_State);
+        textView_Battery_State.setText("status: "+battery_status+",charging: " +isCharging );
+        textView_UID = (TextView) myInflatedView.findViewById(R.id.MainFragment_TextView_UID);
+        mAuth = FirebaseAuth.getInstance();
+        mAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if (user != null) {
+                    // User is signed in
+                    Log.d("mainFragment", "onAuthStateChanged:signed_in:" + user.getUid());
+                    textView_UID.setText(user.getUid());
+                } else {
+                    // User is signed out
+                    textView_UID.setText("null");
+                }
+            }
+        };
+
+
+        return myInflatedView;
+
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        mAuth.addAuthStateListener(mAuthListener);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (mAuthListener != null) {
+            mAuth.removeAuthStateListener(mAuthListener);
+        }
     }
 
     // TODO: Rename method, update argument and hook method into UI event

@@ -9,5 +9,8 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_openstreetmap">OpenstreetmapActivity</string>
-    <string name="ForegroundService_notification">UBI app is Running</string>>
+    <string name="ForegroundService_notification">UBI app is Running</string>
+
+    <string name="broadcastReceiverTitle">charging receiver</string>
+
 </resources>
