@@ -52,7 +52,8 @@ public class localDataActivity extends AppCompatActivity {
             FileOutputStream fOut = openFileOutput(fName, MODE_APPEND);
             OutputStreamWriter osw = new OutputStreamWriter(fOut);
             // 寫入資料
-            osw.write("She sell sea shells on the sea shore .");
+            String test="[{\"time\":1521368527739,\"latLng\":\"lat\\/lng: (24.96609268,121.19062186)\",\"speed\":29.448001098632812,\"degree\":-172.8938446044922,\"type\":0},{\"time\":1521368528243,\"latLng\":\"lat\\/lng: (24.96609268,121.19062186)\",\"speed\":29.448001098632812,\"degree\":-165.43907165527344,\"type\":0}][{\"time\":1521368527739,\"latLng\":\"lat\\/lng: (24.96609268,121.19062186)\",\"speed\":29.448001098632812,\"degree\":-172.8938446044922,\"type\":0},{\"time\":1521368528243,\"latLng\":\"lat\\/lng: (24.96609268,121.19062186)\",\"speed\":29.448001098632812,\"degree\":-165.43907165527344,\"type\":0}][{\"time\":1521368527739,\"latLng\":\"lat\\/lng: (24.96609268,121.19062186)\",\"speed\":29.448001098632812,\"degree\":-172.8938446044922,\"type\":0},{\"time\":1521368528243,\"latLng\":\"lat\\/lng: (24.96609268,121.19062186)\",\"speed\":29.448001098632812,\"degree\":-165.43907165527344,\"type\":0}]";
+            osw.write(test);
             osw.close();
             Toast.makeText(context, "File saved successfully!",
                     Toast.LENGTH_SHORT).show();

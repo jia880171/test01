@@ -90,11 +90,11 @@ public class ServiceContralFragment extends Fragment {
         getActivity().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
         Log.d("in service control","onResume,mBound: "+mBound );
         //要求權限
-        int permission = ActivityCompat.checkSelfPermission(getActivity(),
+        int permission_Location = ActivityCompat.checkSelfPermission(getActivity(),
                 Manifest.permission.ACCESS_FINE_LOCATION);
-        if (permission != PackageManager.PERMISSION_GRANTED) {
+        if (permission_Location != PackageManager.PERMISSION_GRANTED) {
             // 無權限，向使用者請求
-            Log.d("lepu in service", "ask permission");
+            Log.d("in service", "ask permission");
             requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
         }
 

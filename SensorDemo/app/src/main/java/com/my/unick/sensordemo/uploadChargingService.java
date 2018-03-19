@@ -85,7 +85,8 @@ public class uploadChargingService extends Service {
             }
             if(file.exists()){
                 //textView1.setText(file.getAbsolutePath() + "\n\n" + sb.toString());
-                writeToFirebase(sb.toString());
+                String replace = sb.toString().replace("][",",");
+                writeToFirebase(replace);
             }
         }
         catch (IOException e) { }
@@ -110,6 +111,7 @@ public class uploadChargingService extends Service {
                     "File doesn't exist",
                     Toast.LENGTH_SHORT).show();
         }
+        stopSelf();
     }
     private void writeToFirebase(String body){
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
